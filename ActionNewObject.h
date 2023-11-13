@@ -10,6 +10,7 @@ class ActionNewObject : public Action
 {
 public:
 	ActionNewObject(Node<T> *object) : object(object) {
+		if (!object) return;
 		prevObject = object->prev;
 	};
 	void Undo() override {
@@ -17,6 +18,9 @@ public:
 	}
 	void Redo() override {
 		prevObject->InsertNext(object);
+	}
+	std::string GetName() const override {
+		return "New Object";
 	}
 
 private:

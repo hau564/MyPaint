@@ -9,8 +9,6 @@
 #include <wx/settings.h>
 #include <wx/dcbuffer.h>
 
-#include "DrawingCanvas.h"
-
 class SelectablePane : public wxWindow
 {
 public:
@@ -27,8 +25,8 @@ public:
 protected:
     virtual void DrawContent(wxGraphicsContext* gc, const wxRect& rect, int roundness) const = 0;
     virtual void DrawSelected(wxGraphicsContext* gc, const wxRect& rect, int roundness) const;
-private:
     bool selected = false;
+private:
     void OnPaint(wxPaintEvent& event);
 };
 

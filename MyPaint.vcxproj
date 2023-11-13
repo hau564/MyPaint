@@ -19,8 +19,12 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ActionPane.cpp" />
     <ClCompile Include="ColorPane.cpp" />
     <ClCompile Include="DrawingCanvas.cpp" />
+    <ClCompile Include="Editor.cpp" />
+    <ClCompile Include="EditorDraw.cpp" />
+    <ClCompile Include="Explorer.cpp" />
     <ClCompile Include="History.cpp" />
     <ClCompile Include="Layer.cpp" />
     <ClCompile Include="main.cpp" />
@@ -35,8 +39,12 @@
   <ItemGroup>
     <ClInclude Include="Action.h" />
     <ClInclude Include="ActionNewObject.h" />
+    <ClInclude Include="ActionPane.h" />
     <ClInclude Include="ColorPane.h" />
     <ClInclude Include="DrawingCanvas.h" />
+    <ClInclude Include="Editor.h" />
+    <ClInclude Include="EditorDraw.h" />
+    <ClInclude Include="Explorer.h" />
     <ClInclude Include="History.h" />
     <ClInclude Include="Layer.h" />
     <ClInclude Include="List.h" />

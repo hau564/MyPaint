@@ -15,6 +15,11 @@ DrawingCanvas::DrawingCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos
 	activePath = nullptr;
 }
 
+void DrawingCanvas::SetExplorer(Explorer* explorer)
+{
+	history = new History(this, explorer);
+}
+
 DrawingCanvas::~DrawingCanvas()
 {
 	while (!layers.empty()) {
@@ -38,11 +43,14 @@ void DrawingCanvas::SetSize(int size)
 void DrawingCanvas::SetMode(int mode)
 {
 	editMode = mode;
+	if (editor) delete editor;
+
 	switch (editMode) {
 	case CURSOR:
 		BuildPathList();
 		break;
-
+	case DRAW:
+		editor = new EditorDraw(this);
 	}
 }
 
@@ -82,13 +90,13 @@ void DrawingCanvas::OnExport(wxCommandEvent& event)
 
 void DrawingCanvas::OnUndo(wxCommandEvent& event)
 {
-	history.Undo();
+	history->Undo();
 	Refresh();
 }
 
 void DrawingCanvas::OnRedo(wxCommandEvent& event)
 {
-	history.Redo();
+	history->Redo();
 	Refresh();
 }
 
@@ -124,9 +132,10 @@ void DrawingCanvas::onMouseDown(wxMouseEvent& event)
 		Refresh();
 		break;
 	}
+	if (editor) editor->OnMouseDown(event);
 }
 
-void DrawingCanvas::onMouseUp(wxMouseEvent&)
+void DrawingCanvas::onMouseUp(wxMouseEvent& event)
 {
 	switch (editMode) {
 	case DRAW :
@@ -136,11 +145,14 @@ void DrawingCanvas::onMouseUp(wxMouseEvent&)
 		activePath->OnPenUp();
 		activeLayer->Last()->InsertNext(activePath);
 
-		history.AddDoneAction(new ActionNewObject<Path*>(activeLayer->Last()));
+		history->AddDoneAction(new ActionNewObject<Path*>(activeLayer->Last()));
 
 		activePath = nullptr;
 		Refresh();
 		break;
+	}
+	if (editor) {
+		editor->OnMouseUp(event);
 	}
 }
 
@@ -153,11 +165,16 @@ void DrawingCanvas::onMouseMove(wxMouseEvent& event)
 		Refresh();
 		break;
 	}
+	if (editor) {
+		editor->OnMouseUp(event);
+	}
 }
 
 void DrawingCanvas::onMouseLeave(wxMouseEvent& event)
 {
-	
+	if (editor) {
+		editor->OnMouseLeave(event);
+	}
 }
 
 void DrawingCanvas::onPaint(wxPaintEvent&)

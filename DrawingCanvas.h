@@ -11,6 +11,8 @@
 #include "Path.h"
 #include "Layer.h"
 #include "History.h"
+#include "ActionNewObject.h"
+#include "EditorDraw.h"
 
 class DrawingCanvas : public wxWindow
 {
@@ -18,6 +20,7 @@ public:
     DrawingCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size);
     ~DrawingCanvas();
 
+    void SetExplorer(Explorer* explorer);
     void SetColor(wxColor color);
     void SetSize(int size);
     void SetMode(int mode);
@@ -35,6 +38,7 @@ public:
     };
 
 private:
+
     void draw(wxGraphicsContext* gc);
 
     void onMouseDown(wxMouseEvent&);
@@ -55,8 +59,9 @@ private:
     Path* activePath;
 
     int editMode = DRAW;
+    Editor* editor;
 
-    History history;
+    History* history;
 };
 
 #endif // !DRAWING_CANVAS_H

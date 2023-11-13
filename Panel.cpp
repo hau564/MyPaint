@@ -60,7 +60,7 @@ void Panel::SetupColorPanes()
 
     wxInitAllImageHandlers();
     wxImage* customColorImage = new wxImage("data/customColorPane.png", wxBITMAP_TYPE_PNG);
-    customColorImage->Rescale(FromDIP(36), FromDIP(36));
+    customColorImage->Rescale(FromDIP(37), FromDIP(37));
 
     colorPicker = new wxBitmapButton((wxWindow*)this, wxID_ANY, wxBitmap(*customColorImage));
     colorPicker->Bind(wxEVT_BUTTON, [this](wxCommandEvent& event)

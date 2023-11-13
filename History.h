@@ -1,13 +1,17 @@
 #pragma once
 
+#ifndef HISTORY_H
+#define HISTORY_H
+
+#include <wx/wx.h>
 #include<vector>
+#include "Explorer.h"
 #include "Action.h"
-#include "ActionNewObject.h"
 
 class History
 {
 public:
-	History();
+	History(wxWindow* parent, Explorer* explorer);
 	~History();
 
 	void AddDoneAction(Action* action);
@@ -16,8 +20,11 @@ public:
 	void Redo();
 	void SetTo(int i);
 
-private:
+protected:
 	std::vector<Action*> actions;
 	int pos;
+	Explorer *explorer;
+	wxWindow *parent;
 };
 
+#endif // !HISTORY_H

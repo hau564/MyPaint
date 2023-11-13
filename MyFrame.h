@@ -7,6 +7,7 @@
 #include "DrawingCanvas.h"
 #include "ColorPane.h"
 #include "Panel.h"
+#include "Explorer.h"
 
 class MyFrame : public wxFrame
 {
@@ -14,16 +15,21 @@ public:
     MyFrame();
 
 private:   
+    void BuildMenuBar();
     
     void OnExit(wxCommandEvent& event);
     void OnExport(wxCommandEvent& event);
     void OnUndo(wxCommandEvent& event);
     void OnRedo(wxCommandEvent& event);
+    void OnHistory(wxCommandEvent& event);
 
 private:
     DrawingCanvas *canvas;
     Panel* panel;
-    
+    Explorer* explorer;
+
+    wxSplitterWindow* splitter;
+    wxSplitterWindow* splitter2;
 };
 
 enum {
