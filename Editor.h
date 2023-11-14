@@ -13,6 +13,7 @@ class Editor
 {
 public:
 	Editor(DrawingCanvas *parent);
+	virtual ~Editor() {};
 
 	virtual void OnMouseDown(wxMouseEvent &event) = 0;
 	virtual void OnMouseMove(wxMouseEvent &event) = 0;

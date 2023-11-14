@@ -123,6 +123,12 @@ void DrawingCanvas::AddPath(Path* path)
 	Refresh();
 }
 
+void DrawingCanvas::AddUndoneAction(Action* action)
+{
+	history->AddUndoneAction(action);
+	Refresh();
+}
+
 
 
 void DrawingCanvas::onMouseDown(wxMouseEvent& event)

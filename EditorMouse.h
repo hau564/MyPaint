@@ -11,6 +11,8 @@ class EditorMouse : public Editor
 {
 public:
 	EditorMouse(DrawingCanvas* parent, std::vector<Path*> paths);
+	~EditorMouse();
+
 	void OnMouseDown(wxMouseEvent &event) override;
 	void OnMouseMove(wxMouseEvent &event) override;
 	void OnMouseUp(wxMouseEvent &event) override;

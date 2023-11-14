@@ -30,6 +30,7 @@
     <ClCompile Include="Layer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyFrame.cpp" />
+    <ClCompile Include="Object.cpp" />
     <ClCompile Include="Panel.cpp" />
     <ClCompile Include="Path.cpp" />
     <ClCompile Include="SelectablePane.cpp" />
@@ -41,6 +42,7 @@
     <ClInclude Include="Action.h" />
     <ClInclude Include="ActionNewObject.h" />
     <ClInclude Include="ActionPane.h" />
+    <ClInclude Include="ActionTransform.h" />
     <ClInclude Include="ColorPane.h" />
     <ClInclude Include="DrawingCanvas.h" />
     <ClInclude Include="Editor.h" />
@@ -52,6 +54,7 @@
     <ClInclude Include="List.h" />
     <ClInclude Include="MyFrame.h" />
     <ClInclude Include="Node.h" />
+    <ClInclude Include="Object.h" />
     <ClInclude Include="Panel.h" />
     <ClInclude Include="Path.h" />
     <ClInclude Include="SelectablePane.h" />

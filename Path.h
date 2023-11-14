@@ -10,24 +10,24 @@
 #include <iostream>
 
 #include "Transform.h"
-#include "SelectionBox.h"
+#include "Object.h"
 
-class Path: public std::vector<wxPoint2DDouble>
+class Path: public Object
 {
 public:
 	Path() { color = *wxBLACK, width = 1; };
 	Path(wxColour color, int width);
 
-	void BuildSelectionBox();
+	void BuildSelectionBox() override;
+	void Draw(wxGraphicsContext* gc) override;
 
-	void Draw(wxGraphicsContext* gc);
-
+	void AddPoint(wxPoint2DDouble point);
 	std::vector<wxPoint2DDouble> GetTransformedPoints() const;
 	
 public:
 	wxColour color;
 	int width;
-	SelectionBox selectionBox;
+	std::vector<wxPoint2DDouble> points;
 };
 
 #endif // !PATH_H
