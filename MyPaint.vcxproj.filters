@@ -132,10 +132,10 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="TransformMove.h">
-      <Filter>Source Files\Header Files</Filter>
+      <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="TransformRotate.h">
-      <Filter>Source Files\Header Files</Filter>
+      <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

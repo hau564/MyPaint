@@ -26,6 +26,7 @@ public:
 private:
 	std::vector<Object*> objects;
 	bool ctrlHolding = false;
+	Object* activeObject;
 	Transform* transform = nullptr;
 	wxPoint2DDouble mouseDown;
 };

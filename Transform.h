@@ -8,7 +8,8 @@ const int RotateArm = 20;
 class Transform
 {
 public:
-	virtual wxAffineMatrix2D GetMatrix(double x1, double y1, double x2, double y2, wxAffineMatrix2D transformMatrix) const = 0;
+	virtual wxAffineMatrix2D GetMatrix(double x1, double y1, double x2, double y2, wxAffineMatrix2D transformMatrix) = 0;
+	virtual void ModifyAdjust(wxPoint2DDouble adj) { adjust = adj; }
 	wxPoint2DDouble adjust;
 };
 

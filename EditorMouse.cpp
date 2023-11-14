@@ -24,7 +24,10 @@ void EditorMouse::OnMouseDown(wxMouseEvent &event)
 	for (auto object : objects) {
 		if (object->selectionBox.selected) {
 			transform = object->selectionBox.OnMouseDown(event);
-			if (transform) return;
+			if (transform) {
+				activeObject = object;
+				return;
+			}
 		}
 	}
 
@@ -37,6 +40,7 @@ void EditorMouse::OnMouseDown(wxMouseEvent &event)
 						p->selectionBox.selected = false;
 					}
 			}
+			activeObject = object;
 			return;
 		}
 	}
@@ -47,9 +51,10 @@ void EditorMouse::OnMouseDown(wxMouseEvent &event)
 void EditorMouse::OnMouseMove(wxMouseEvent &event)
 {
 	if (!transform) return;
-	transform->adjust = event.GetPosition() - mouseDown;
+	transform->ModifyAdjust(event.GetPosition() - mouseDown);
 
-	for (auto object : objects) {
+	activeObject->selectionBox.DoTransform(transform);
+	for (auto object : objects) if (object != activeObject) {
 		if (object->selectionBox.selected)
 			object->selectionBox.DoTransform(transform);
 	}
