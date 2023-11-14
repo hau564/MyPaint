@@ -63,9 +63,6 @@
     <ClCompile Include="EditorMouse.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Transform.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="Object.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -134,7 +131,10 @@
     <ClInclude Include="Object.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="ActionTransform.h">
+    <ClInclude Include="TransformMove.h">
+      <Filter>Source Files\Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="TransformRotate.h">
       <Filter>Source Files\Header Files</Filter>
     </ClInclude>
   </ItemGroup>

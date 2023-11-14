@@ -50,7 +50,7 @@ void DrawingCanvas::SetMode(int mode)
 		break;
 
 	case CURSOR:
-		std::vector<Path*> paths;
+		std::vector<Object*> paths;
 		for (auto layer : layers) {
 			auto pathOfLayer = layer->GetVectorData();
 			for (auto path : pathOfLayer) {
@@ -119,7 +119,7 @@ void DrawingCanvas::AddPath(Path* path)
 	if (!activeLayer) return;
 
 	activeLayer->Last()->InsertNext(path);
-	history->AddDoneAction(new ActionNewObject<Path*>(activeLayer->Last()));
+	history->AddDoneAction(new ActionNewObject<Object*>(activeLayer->Last()));
 	Refresh();
 }
 

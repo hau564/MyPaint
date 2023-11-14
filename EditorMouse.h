@@ -10,7 +10,7 @@ typedef std::pair<Path*, SelectionBox*> PathBox;
 class EditorMouse : public Editor
 {
 public:
-	EditorMouse(DrawingCanvas* parent, std::vector<Path*> paths);
+	EditorMouse(DrawingCanvas* parent, std::vector<Object*> objects);
 	~EditorMouse();
 
 	void OnMouseDown(wxMouseEvent &event) override;
@@ -24,7 +24,9 @@ public:
 	void Draw(wxGraphicsContext* gc) override;
 
 private:
-	std::vector<Path*> paths;
+	std::vector<Object*> objects;
 	bool ctrlHolding = false;
+	Transform* transform = nullptr;
+	wxPoint2DDouble mouseDown;
 };
 

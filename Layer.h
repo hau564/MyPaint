@@ -8,7 +8,7 @@
 #include "Path.h"
 #include "List.h"
 
-class Layer : public List<Path*>
+class Layer : public List<Object*>
 {
 public:
 	Layer();

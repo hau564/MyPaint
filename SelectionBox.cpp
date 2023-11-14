@@ -19,41 +19,35 @@ void SelectionBox::Build(int n, wxPoint2DDouble* a, int width)
 void SelectionBox::Draw(wxGraphicsContext* gc)
 {
 	if (!selected) return;
-
-	Transform t = GetTotalTransform();
-
-	gc->SetPen(*wxBLACK_DASHED_PEN);
+	gc->SetPen(wxPen(wxColour(200, 200, 200), 0.5));
+	gc->SetBrush(*wxTRANSPARENT_BRUSH);
 	gc->DrawRectangle(x1, y1, x2 - x1, y2 - y1);
 
-	double si = (x2 - x1) / 2, sj = (y2 - y1) / 2;
-
-	gc->SetTransform(gc->CreateMatrix(Transform()));
-
-	wxPoint2DDouble topMid = t.TransformPoint({ x1 + si, y1 });
-	rotatePoint = t.TransformDistance({ 0, -30 });
-	rotatePoint += topMid;
-	gc->StrokeLine(topMid.m_x, topMid.m_y, rotatePoint.m_x, rotatePoint.m_y);
+	double dx = (x2 - x1) / 2, dy = (y2 - y1) / 2;
+	wxAffineMatrix2D tmatrix = GetTotalTransformMatrix();
 
 	gc->SetBrush(*wxWHITE_BRUSH);
-	gc->SetPen(*wxBLACK_PEN);
+	gc->SetTransform(gc->CreateMatrix(wxAffineMatrix2D()));
 
+	wxPoint2DDouble topMid = tmatrix.TransformPoint({ x1 + dx, y1 });
+	wxPoint2DDouble rotatePoint = tmatrix.TransformDistance({ 0, -RotateArm }) + topMid;
+	
+	gc->StrokeLine(topMid.m_x, topMid.m_y, rotatePoint.m_x, rotatePoint.m_y);
 	gc->DrawEllipse(rotatePoint.m_x - r, rotatePoint.m_y - r, 2 * r, 2 * r);
+
 	for (int i = 0; i < 3; ++i) {
 		for (int j = 0; j < 3; ++j) {
 			if (i == 1 && j == 1) continue;
-			wxPoint2DDouble point(x1 + si * i, y1 + sj * j);
-			t.TransformPoint(&point.m_x, &point.m_y);
-
-			gc->DrawEllipse(point.m_x - r, point.m_y - r, 2 * r, 2 * r);
+			wxPoint2DDouble p(x1 + dx * i, y1 + dy * j);
+			tmatrix.TransformPoint(&p.m_x, &p.m_y);
+			gc->DrawEllipse(p.m_x - r, p.m_y - r, 2 * r, 2 * r);
 		}
 	}
 }
 
 bool SelectionBox::Contains(wxPoint point) const
 {
-	Transform inv = transform;
-	inv.Invert();
-	return bound.Contains(inv.TransformPoint(point));
+	
 }
 
 double SelectionBox::GetArea() const
@@ -61,85 +55,48 @@ double SelectionBox::GetArea() const
 	return (bound.GetRight() - bound.GetLeft()) * (bound.GetBottom() - bound.GetTop());
 }
 
-Transform SelectionBox::GetTotalTransform()
+
+
+Transform* SelectionBox::OnMouseDown(wxMouseEvent& event)
 {
-	Transform t(transform);
-	t.Concat(tempTransform);
-	return t;
-}
-
-
-
-bool SelectionBox::OnMouseDown(wxMouseEvent& event)
-{
-	wxPoint2DDouble pos(event.GetX(), event.GetY());
-	transform.Invert();
-	transform.TransformPoint(&pos.m_x, &pos.m_y);
-	transform.Invert();
+	transformMatrix.Invert();
+	wxPoint2DDouble pos = transformMatrix.TransformPoint(event.GetPosition());
+	transformMatrix.Invert();
 
 	if (!selected) {
 		if (bound.Contains(pos)) {
-			selected = true;
-			mode = MOVE;
-			return true;
+			selected = 1;
+			return new TransformMove();
 		}
-		return false;
+		return nullptr;
 	}
 
-	wxRect2DDouble rotateRect((x1 + x2) / 2 - r, y1 - 30 - r, 2 * r, 2 * r);
+	double dx = (x2 - x1) / 2, dy = (y2 - y1) / 2;
+	wxRect2DDouble rotateRect(x1 + dx - r, y1 - RotateArm - r, 2 * r, 2 * r);
 	if (rotateRect.Contains(pos)) {
-		mode = ROTATE;
-		return true;
+		return new TransformRotate();
 	}
 
-	double si = (x2 - x1) / 2, sj = (y2 - y1) / 2;
-	for (int i = 0; i < 3; ++i) {
-		for (int j = 0; j < 3; ++j) {
-			if (i == 1 && j == 1) continue;
-			wxPoint2DDouble point(x1 + si * i, y1 + sj * j);
-
-			if (wxRect2DDouble(point.m_x - r, point.m_y - r, 2 * r, 2 * r).Contains(pos)) {
-
-				return true;
-			}
-		}
+	if (bound.Contains(pos)) {
+		return new TransformMove();
 	}
-
-	return false;
+	return nullptr;
 }
 
-bool SelectionBox::OnMouseMove(wxMouseEvent& event)
+void SelectionBox::DoTransform(Transform* transform)
 {
-	if (!selected) return false;
-
-	wxPoint2DDouble pos(event.GetX(), event.GetY());
-	transform.Invert();
-	transform.TransformPoint(&pos.m_x, &pos.m_y);
-	transform.Invert();
-
-	wxPoint2DDouble center((x1 + x2) / 2, (y1 + y2) / 2);
-	wxPoint2DDouble c = transform.TransformPoint(center);
-
-	if (mode == ROTATE) {
-		double angle = atan2(pos.m_x - center.m_x, center.m_y - pos.m_y);
-
-		tempTransform = Transform();
-		tempTransform.Translate(c.m_x, c.m_y);
-		tempTransform.Rotate(angle);
-		tempTransform.Translate(-c.m_x, -c.m_y);
-	}
-
-	return false;
+	primaryTransformMatrix = transform->GetMatrix(x1, y1, x2, y2, transformMatrix);
 }
 
-bool SelectionBox::OnMouseUp(wxMouseEvent& event)
+wxAffineMatrix2D SelectionBox::GetTotalTransformMatrix() const
 {
-	mode = 0;
-	return false;
+	wxAffineMatrix2D t(transformMatrix);
+	t.Concat(primaryTransformMatrix);
+	return t;
 }
 
 void SelectionBox::CommitTransform()
 {
-	transform.Concat(tempTransform);
-	tempTransform = Transform();
+	transformMatrix.Concat(primaryTransformMatrix);
+	primaryTransformMatrix = wxAffineMatrix2D();
 }

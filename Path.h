@@ -22,7 +22,6 @@ public:
 	void Draw(wxGraphicsContext* gc) override;
 
 	void AddPoint(wxPoint2DDouble point);
-	std::vector<wxPoint2DDouble> GetTransformedPoints() const;
 	
 public:
 	wxColour color;

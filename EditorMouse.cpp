@@ -1,63 +1,68 @@
 #include "EditorMouse.h"
 #include "DrawingCanvas.h"
 
-EditorMouse::EditorMouse(DrawingCanvas* parent, std::vector<Path*> _paths)
-	:Editor(parent), paths(_paths)
+EditorMouse::EditorMouse(DrawingCanvas* parent, std::vector<Object*> _objects)
+	:Editor(parent), objects(_objects)
 {
-	for (auto path : paths)
-		path->BuildSelectionBox();
-
-	std::sort(paths.begin(), paths.end(),
-		[&](const Path* a, const Path* b) {
+	for (auto object : objects) object->BuildSelectionBox();
+	std::sort(objects.begin(), objects.end(),
+		[&](const Object* a, const Object* b) {
 			return a->selectionBox.GetArea() < b->selectionBox.GetArea();
 		});
 }
 
 EditorMouse::~EditorMouse()
 {
-	for (auto path : paths) path->selectionBox.selected = 0;
+	if (transform) delete transform;
+	for (auto object : objects)
+		object->selectionBox.selected = false;
 }
 
 void EditorMouse::OnMouseDown(wxMouseEvent &event)
 {
-	for (auto path : paths) {
-		bool pathSelected = path->selectionBox.selected;
-		if (path->selectionBox.OnMouseDown(event)) {
+	mouseDown = event.GetPosition();
+	for (auto object : objects) {
+		if (object->selectionBox.selected) {
+			transform = object->selectionBox.OnMouseDown(event);
+			if (transform) return;
+		}
+	}
 
-			if (!pathSelected) {
-				if (!ctrlHolding) {
-					for (auto p : paths) 
-						if (p != path) 
-							p->selectionBox.selected = 0;
-				}
+	for (auto object : objects) {
+		transform = object->selectionBox.OnMouseDown(event);
+		if (transform) {
+			if (!ctrlHolding) {
+				for (auto p : objects)
+					if (p != object) {
+						p->selectionBox.selected = false;
+					}
 			}
-
 			return;
 		}
 	}
-	for (auto path : paths) path->selectionBox.selected = 0;
+
+	for (auto object : objects) object->selectionBox.selected = false;
 }
 
 void EditorMouse::OnMouseMove(wxMouseEvent &event)
 {
-	for (auto path : paths) path->selectionBox.OnMouseMove(event);
+	if (!transform) return;
+	transform->adjust = event.GetPosition() - mouseDown;
+
+	for (auto object : objects) {
+		if (object->selectionBox.selected)
+			object->selectionBox.DoTransform(transform);
+	}
 }
 
 void EditorMouse::OnMouseUp(wxMouseEvent &event)
 {
-	Transform temp;
-	for (auto path : paths) if (path->selectionBox.tempTransform != temp) {
-		temp = path->selectionBox.tempTransform;
-		break;
+	if (!transform) return;
+	for (auto object : objects) {
+		object->selectionBox.CommitTransform();
 	}
-	std::vector<Path*> selectedPaths;
-	for (auto path : paths) if (path->selectionBox.selected) {
-		selectedPaths.push_back(path);
-		path->selectionBox.mode = 0;
-	}
-	
-	if (temp.IsIdentity()) return;
-	parent->AddUndoneAction(new ActionTransform(selectedPaths, temp));
+	delete transform;
+	transform = nullptr;
 }
 
 void EditorMouse::OnMouseLeave(wxMouseEvent &event)

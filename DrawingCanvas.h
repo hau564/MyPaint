@@ -12,7 +12,6 @@
 #include "Layer.h"
 #include "History.h"
 #include "ActionNewObject.h"
-#include "ActionTransform.h"
 #include "EditorDraw.h"
 #include "EditorMouse.h"
 
