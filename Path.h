@@ -9,28 +9,25 @@
 #include <wx/splitter.h>
 #include <iostream>
 
+#include "Transform.h"
 #include "SelectionBox.h"
 
-class Path: public std::vector<wxPoint2DDouble>, public SelectionBox
+class Path: public std::vector<wxPoint2DDouble>
 {
 public:
-	Path() {};
+	Path() { color = *wxBLACK, width = 1; };
 	Path(wxColour color, int width);
+
+	void BuildSelectionBox();
 
 	void Draw(wxGraphicsContext* gc);
 
-	void OnPenDown(wxPoint2DDouble pos);
-	void OnPenMove(wxPoint2DDouble pos);
-	void OnPenUp();
+	std::vector<wxPoint2DDouble> GetTransformedPoints() const;
 	
-	void SetSelected(bool selected) { this->selected = selected; }
-	Path* OnMouseDown(wxPoint pos);
-
 public:
 	wxColour color;
 	int width;
-	bool finished = false;
-	bool selected = false;
+	SelectionBox selectionBox;
 };
 
 #endif // !PATH_H

@@ -9,7 +9,7 @@ ActionPane::ActionPane(wxWindow* parent, const Action* action, const int actionI
 void ActionPane::DrawContent(wxGraphicsContext* gc, const wxRect& rect, int roundness) const
 {
 	if (!selected) {
-		gc->SetPen(wxColor(150, 150, 150));
+		gc->SetPen(wxPen(wxColor(200, 200, 200), 0.5));
 		gc->SetBrush(*wxTRANSPARENT_BRUSH);
 		gc->DrawRoundedRectangle(rect.GetX(), rect.GetY(), rect.GetWidth(), rect.GetHeight(), 5);
 	}

@@ -104,7 +104,7 @@ void Panel::SelectColorPane(ColorPane* colorPane)
     {
 		pane->SetSelected(pane->GetColor() == colorPane->GetColor());
 	}
-    canvas->SetColor(colorPane->GetColor());
+    canvas->SetPenColor(colorPane->GetColor());
 }
 
 void Panel::SelectSizePane(SizePane* sizePane)
@@ -114,7 +114,7 @@ void Panel::SelectSizePane(SizePane* sizePane)
         pane->SetSelected(pane == sizePane);
     }
     canvas->SetMode(DrawingCanvas::DRAW);
-    canvas->SetSize(sizePane->GetWidth());
+    canvas->SetPenSize(sizePane->GetWidth());
 }
 
 void Panel::Layout(int msk)

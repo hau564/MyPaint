@@ -90,3 +90,13 @@ void MyFrame::OnHistory(wxCommandEvent& event)
 {
     splitter2->SplitVertically(splitter, explorer, FromDIP(1300));
 }
+
+void MyFrame::OnKeyDown(wxKeyEvent& event)
+{
+    canvas->onKeyDown(event);
+}
+
+void MyFrame::OnKeyUp(wxKeyEvent& event)
+{
+    canvas->onKeyUp(event);
+}

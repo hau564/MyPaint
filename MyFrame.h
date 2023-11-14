@@ -7,12 +7,17 @@
 #include "DrawingCanvas.h"
 #include "ColorPane.h"
 #include "Panel.h"
-#include "Explorer.h"
+
+
+
 
 class MyFrame : public wxFrame
 {
 public:
     MyFrame();
+
+    void OnKeyDown(wxKeyEvent& event);
+    void OnKeyUp(wxKeyEvent& event);
 
 private:   
     void BuildMenuBar();

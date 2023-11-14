@@ -7,42 +7,21 @@ Path::Path(wxColour color, int width)
 	this->width = width;
 }
 
-void Path::Draw(wxGraphicsContext* gc)
+void Path::BuildSelectionBox()
 {
+	selectionBox.Build(size(), data());
+}
+
+void Path::Draw(wxGraphicsContext* gc) {
 	gc->SetPen(wxPen(color, width));
-	gc->StrokeLines(size(), data());
-
-	if (finished && selected) {
-		SelectionBox::Draw(gc);
-	}
+	std::vector<wxPoint2DDouble> points = GetTransformedPoints();
+	gc->StrokeLines(size(), points.data());
 }
 
-void Path::OnPenDown(wxPoint2DDouble pos)
+std::vector<wxPoint2DDouble> Path::GetTransformedPoints() const
 {
-	push_back(pos);
+	std::vector<wxPoint2DDouble> points = *this;
+	for (auto &point : points)
+		selectionBox.transform.TransformPoint(&point.m_x, &point.m_y);
+	return points;
 }
-
-void Path::OnPenMove(wxPoint2DDouble pos)
-{
-	push_back(pos);
-}
-
-void Path::OnPenUp()
-{
-	BuildBox(size(), data(), width);
-	finished = true;
-}
-
-
-
-Path* Path::OnMouseDown(wxPoint pos)
-{
-	if (!GetBound().Contains(pos)) {
-		selected = false;
-		return nullptr;
-	}
-	else {
-		selected = true;
-		return this;
-	}
-} 

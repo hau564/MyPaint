@@ -13,6 +13,7 @@
 #include "History.h"
 #include "ActionNewObject.h"
 #include "EditorDraw.h"
+#include "EditorMouse.h"
 
 class DrawingCanvas : public wxWindow
 {
@@ -21,13 +22,21 @@ public:
     ~DrawingCanvas();
 
     void SetExplorer(Explorer* explorer);
-    void SetColor(wxColor color);
-    void SetSize(int size);
+    void SetPenColor(wxColor color);
+    void SetPenSize(int size);
     void SetMode(int mode);
+
+    wxColor GetPenColor() const { return penColor; }
+    int GetPenSize() const { return penSize; }
 
     void OnExport(wxCommandEvent& event);
     void OnUndo(wxCommandEvent& event);
     void OnRedo(wxCommandEvent& event);
+
+    void onKeyDown(wxKeyEvent& event);
+    void onKeyUp(wxKeyEvent& event);
+
+    void AddPath(Path* path);
 
     enum {
         CURSOR = 1,
@@ -47,20 +56,13 @@ private:
     void onMouseMove(wxMouseEvent& event);
     void onMouseLeave(wxMouseEvent& event);
 
-    void BuildPathList();
-
 private:
     wxColor penColor = wxColor(0, 0, 0);
     int penSize = 1;
 
     std::vector<Layer*> layers;
-    std::vector<Path*> paths;
     Layer* activeLayer;
-    Path* activePath;
-
-    int editMode = DRAW;
     Editor* editor;
-
     History* history;
 };
 

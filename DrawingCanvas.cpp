@@ -12,7 +12,6 @@ DrawingCanvas::DrawingCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos
 	
 	layers.push_back(new Layer());
 	activeLayer = layers[0];
-	activePath = nullptr;
 }
 
 void DrawingCanvas::SetExplorer(Explorer* explorer)
@@ -30,28 +29,38 @@ DrawingCanvas::~DrawingCanvas()
 
 
 
-void DrawingCanvas::SetColor(wxColor color)
+void DrawingCanvas::SetPenColor(wxColor color)
 {
 	penColor = color;
 }
 
-void DrawingCanvas::SetSize(int size)
+void DrawingCanvas::SetPenSize(int size)
 {
 	penSize = size;
 }
 
 void DrawingCanvas::SetMode(int mode)
 {
-	editMode = mode;
 	if (editor) delete editor;
+	editor = nullptr;
 
-	switch (editMode) {
-	case CURSOR:
-		BuildPathList();
-		break;
+	switch (mode) {
 	case DRAW:
 		editor = new EditorDraw(this);
+		break;
+
+	case CURSOR:
+		std::vector<Path*> paths;
+		for (auto layer : layers) {
+			auto pathOfLayer = layer->GetVectorData();
+			for (auto path : pathOfLayer) {
+				paths.push_back(path);
+			}
+		}
+		editor = new EditorMouse(this, paths);
+		break;
 	}
+	Refresh();
 }
 
 
@@ -105,68 +114,38 @@ void DrawingCanvas::OnRedo(wxCommandEvent& event)
 
 
 
-
-void DrawingCanvas::draw(wxGraphicsContext* gc)
+void DrawingCanvas::AddPath(Path* path)
 {
-	for (Layer* layer : layers) {
-		layer->Draw(gc);
-	}
-	if (activePath) activePath->Draw(gc);
+	if (!activeLayer) return;
+
+	activeLayer->Last()->InsertNext(path);
+	history->AddDoneAction(new ActionNewObject<Path*>(activeLayer->Last()));
+	Refresh();
 }
+
+
 
 void DrawingCanvas::onMouseDown(wxMouseEvent& event)
 {
-	switch (editMode) {
-	case DRAW:
-		activePath = new Path(penColor, penSize);
-		activePath->OnPenDown(event.GetPosition());
-		break;
-
-	case CURSOR:
-		activePath = nullptr;
-		for (auto path : paths) {
-			activePath = path->OnMouseDown(event.GetPosition());
-			if (activePath) break;
-		}
-		for (auto path : paths) if (path != activePath) path->SetSelected(false);
+	if (editor) {
+		editor->OnMouseDown(event);
 		Refresh();
-		break;
 	}
-	if (editor) editor->OnMouseDown(event);
 }
 
 void DrawingCanvas::onMouseUp(wxMouseEvent& event)
 {
-	switch (editMode) {
-	case DRAW :
-		if (!activePath) return;
-		if (!activeLayer) return;
-		
-		activePath->OnPenUp();
-		activeLayer->Last()->InsertNext(activePath);
-
-		history->AddDoneAction(new ActionNewObject<Path*>(activeLayer->Last()));
-
-		activePath = nullptr;
-		Refresh();
-		break;
-	}
 	if (editor) {
 		editor->OnMouseUp(event);
+		Refresh();
 	}
 }
 
 void DrawingCanvas::onMouseMove(wxMouseEvent& event)
 {
-	switch (editMode) {
-	case DRAW:
-		if (!activePath) return;
-		activePath->OnPenMove(event.GetPosition());
-		Refresh();
-		break;
-	}
 	if (editor) {
-		editor->OnMouseUp(event);
+		editor->OnMouseMove(event);
+		Refresh();
 	}
 }
 
@@ -174,7 +153,28 @@ void DrawingCanvas::onMouseLeave(wxMouseEvent& event)
 {
 	if (editor) {
 		editor->OnMouseLeave(event);
+		Refresh();
 	}
+}
+
+void DrawingCanvas::onKeyDown(wxKeyEvent& event)
+{
+	if (editor) editor->OnKeyDown(event);
+}
+
+void DrawingCanvas::onKeyUp(wxKeyEvent& event)
+{
+	if (editor) editor->OnKeyUp(event);
+}
+
+
+
+void DrawingCanvas::draw(wxGraphicsContext* gc)
+{
+	for (Layer* layer : layers) {
+		layer->Draw(gc);
+	}
+	if (editor) editor->Draw(gc);
 }
 
 void DrawingCanvas::onPaint(wxPaintEvent&)
@@ -191,16 +191,3 @@ void DrawingCanvas::onPaint(wxPaintEvent&)
 	}
 }
 
-void DrawingCanvas::BuildPathList()
-{
-	paths.clear();
-	for (Layer* layer : layers) {
-		auto layerPaths = layer->GetVectorData();
-		paths.insert(paths.end(), layerPaths.begin(), layerPaths.end());
-	}
-	
-	sort(paths.begin(), paths.end(),
-		[&](const Path* a, const Path* b) {
-			return a->GetBoundArea() < b->GetBoundArea();
-		});
-}

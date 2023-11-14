@@ -45,9 +45,6 @@
     <ClCompile Include="SelectionBox.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
-    <ClCompile Include="Transformation.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
     <ClCompile Include="History.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
@@ -61,6 +58,12 @@
       <Filter>Source Files</Filter>
     </ClCompile>
     <ClCompile Include="EditorDraw.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorMouse.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="Transform.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
@@ -92,9 +95,6 @@
     <ClInclude Include="SelectionBox.h">
       <Filter>Source Files</Filter>
     </ClInclude>
-    <ClInclude Include="Transformation.h">
-      <Filter>Source Files</Filter>
-    </ClInclude>
     <ClInclude Include="Action.h">
       <Filter>Source Files</Filter>
     </ClInclude>
@@ -120,6 +120,12 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="EditorDraw.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorMouse.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Transform.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

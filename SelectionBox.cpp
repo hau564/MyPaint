@@ -1,6 +1,6 @@
 #include "SelectionBox.h"
 
-void SelectionBox::BuildBox(int n, wxPoint2DDouble* a, int width)
+void SelectionBox::Build(int n, wxPoint2DDouble* a, int width)
 {
 	if (!n) return;
 	x1 = x2 = a[0].m_x;
@@ -18,11 +18,20 @@ void SelectionBox::BuildBox(int n, wxPoint2DDouble* a, int width)
 void SelectionBox::Draw(wxGraphicsContext* gc)
 {
 	gc->SetPen(*wxBLACK_DASHED_PEN);
-	gc->DrawRectangle(	bound.GetLeft(), bound.GetTop(), 
-						bound.GetRight() - bound.GetLeft(), bound.GetBottom() - bound.GetTop());
+	auto points = std::vector<wxPoint2DDouble>{ {x1, y1}, {x2, y1}, {x2, y2}, {x1, y2}, {x1, y1} };
+	for (auto &point : points)
+		transform.TransformPoint(&point.m_x, &point.m_y);
+	gc->StrokeLines(points.size(), points.data());
 }
 
-double SelectionBox::GetBoundArea() const
+bool SelectionBox::Contains(wxPoint point) const
+{
+	Transform inv = transform;
+	inv.Invert();
+	return bound.Contains(inv.TransformPoint(point));
+}
+
+double SelectionBox::GetArea() const
 {
 	return (bound.GetRight() - bound.GetLeft()) * (bound.GetBottom() - bound.GetTop());
 }
@@ -30,15 +39,4 @@ double SelectionBox::GetBoundArea() const
 wxRect2DDouble SelectionBox::GetBound() const
 {
 	return bound;
-}
-
-std::vector<wxPoint2DDouble> SelectionBox::GetCorners()
-{
-	std::vector<wxPoint2DDouble> corners;
-	corners.push_back(wxPoint2DDouble(x1, y1));
-	corners.push_back(wxPoint2DDouble(x2, y1));
-	corners.push_back(wxPoint2DDouble(x2, y2));
-	corners.push_back(wxPoint2DDouble(x1, y2));
-	corners.push_back(wxPoint2DDouble(x1, y1));
-	return corners;	
 }
