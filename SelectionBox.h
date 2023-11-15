@@ -7,6 +7,7 @@
 #include "Transform.h"
 #include "TransformMove.h"
 #include "TransformRotate.h"
+#include "TransformResize.h"
 
 class SelectionBox
 {
@@ -15,16 +16,18 @@ public:
 
 	void Build(int n, wxPoint2DDouble* a, int width = 0);
 	void Draw(wxGraphicsContext* gc);
-
-	bool Contains(wxPoint point) const;
+	Transform* OnMouseDown(wxMouseEvent &event);
 
 	double GetArea() const;
-
-	Transform* OnMouseDown(wxMouseEvent &event);
-	
+		
+	void SetSelected(bool selected) { this->selected = selected; }
+	bool IsSelected() const { return selected; }
+		
+	void SetTransform(wxAffineMatrix2D transformMatrix);
 	void DoTransform(Transform *transform);
-	wxAffineMatrix2D GetTotalTransformMatrix() const;
 	void CommitTransform();
+	wxAffineMatrix2D GetBaseTransform() const { return transformMatrix; }
+	wxAffineMatrix2D GetTotalTransformMatrix() const;
 
 	enum {
 		MOVE = 1,
@@ -33,11 +36,12 @@ public:
 		ROTATE = 8
 	};
 
-public:
+private:
 	double x1, x2, y1, y2;
 	wxRect2DDouble bound;
 	int width, r = 4;
 	bool selected = false;
+	wxPoint2DDouble rotatePoint;
 	wxAffineMatrix2D transformMatrix, primaryTransformMatrix;
 };
 

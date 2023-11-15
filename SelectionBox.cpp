@@ -20,17 +20,21 @@ void SelectionBox::Draw(wxGraphicsContext* gc)
 {
 	if (!selected) return;
 	gc->SetPen(wxPen(wxColour(200, 200, 200), 0.5));
-	gc->SetBrush(*wxTRANSPARENT_BRUSH);
-	gc->DrawRectangle(x1, y1, x2 - x1, y2 - y1);
+	gc->SetBrush(*wxWHITE_BRUSH);
+	gc->SetTransform(gc->CreateMatrix(wxAffineMatrix2D()));
 
 	double dx = (x2 - x1) / 2, dy = (y2 - y1) / 2;
 	wxAffineMatrix2D tmatrix = GetTotalTransformMatrix();
 
-	gc->SetBrush(*wxWHITE_BRUSH);
-	gc->SetTransform(gc->CreateMatrix(wxAffineMatrix2D()));
+	std::vector<wxPoint2DDouble> points = { {x1, y1}, {x1, y2}, {x2, y2}, {x2, y1}, {x1, y1} };
+	for (auto& p : points) 
+		p = tmatrix.TransformPoint(p);
+	gc->StrokeLines(points.size(), points.data());
 
 	wxPoint2DDouble topMid = tmatrix.TransformPoint({ x1 + dx, y1 });
-	wxPoint2DDouble rotatePoint = tmatrix.TransformDistance({ 0, -RotateArm }) + topMid;
+	wxPoint2DDouble midToTop = topMid - tmatrix.TransformPoint({ x1 + dx, y1 + dy });
+	double len = sqrt(midToTop.m_x * midToTop.m_x + midToTop.m_y * midToTop.m_y);
+	rotatePoint = topMid + midToTop	/ len * RotateArm;
 	
 	gc->StrokeLine(topMid.m_x, topMid.m_y, rotatePoint.m_x, rotatePoint.m_y);
 	gc->DrawEllipse(rotatePoint.m_x - r, rotatePoint.m_y - r, 2 * r, 2 * r);
@@ -45,11 +49,6 @@ void SelectionBox::Draw(wxGraphicsContext* gc)
 	}
 }
 
-bool SelectionBox::Contains(wxPoint point) const
-{
-	
-}
-
 double SelectionBox::GetArea() const
 {
 	return (bound.GetRight() - bound.GetLeft()) * (bound.GetBottom() - bound.GetTop());
@@ -60,7 +59,8 @@ double SelectionBox::GetArea() const
 Transform* SelectionBox::OnMouseDown(wxMouseEvent& event)
 {
 	transformMatrix.Invert();
-	wxPoint2DDouble pos = transformMatrix.TransformPoint(event.GetPosition());
+	wxPoint2DDouble originalPos = event.GetPosition();
+	wxPoint2DDouble pos = transformMatrix.TransformPoint(originalPos);
 	transformMatrix.Invert();
 
 	if (!selected) {
@@ -72,15 +72,34 @@ Transform* SelectionBox::OnMouseDown(wxMouseEvent& event)
 	}
 
 	double dx = (x2 - x1) / 2, dy = (y2 - y1) / 2;
-	wxRect2DDouble rotateRect(x1 + dx - r, y1 - RotateArm - r, 2 * r, 2 * r);
-	if (rotateRect.Contains(pos)) {
+	wxRect2DDouble rotateRect(rotatePoint.m_x - r, rotatePoint.m_y- r, 2 * r, 2 * r);
+	if (rotateRect.Contains(originalPos)) {
 		return new TransformRotate();
+	}
+
+	for (int i = 0; i < 3; ++i) {
+		for (int j = 0; j < 3; ++j) {
+			if (i == 1 && j == 1) continue;
+			wxRect2DDouble rect(x1 + dx * i - r, y1 + dy * j - r, 2 * r, 2 * r);
+			if (rect.Contains(pos)) {
+				TransformResize* t = new TransformResize;
+				t->typeX = i;
+				t->typeY = j;
+				return t;
+			}
+		}
 	}
 
 	if (bound.Contains(pos)) {
 		return new TransformMove();
 	}
 	return nullptr;
+}
+
+void SelectionBox::SetTransform(wxAffineMatrix2D transformMatrix)
+{
+	this->transformMatrix = transformMatrix;
+	primaryTransformMatrix = wxAffineMatrix2D();
 }
 
 void SelectionBox::DoTransform(Transform* transform)
@@ -90,13 +109,14 @@ void SelectionBox::DoTransform(Transform* transform)
 
 wxAffineMatrix2D SelectionBox::GetTotalTransformMatrix() const
 {
-	wxAffineMatrix2D t(transformMatrix);
-	t.Concat(primaryTransformMatrix);
+	wxAffineMatrix2D t(primaryTransformMatrix);
+	t.Concat(transformMatrix);
 	return t;
 }
 
 void SelectionBox::CommitTransform()
 {
+	std::swap(transformMatrix, primaryTransformMatrix);
 	transformMatrix.Concat(primaryTransformMatrix);
 	primaryTransformMatrix = wxAffineMatrix2D();
 }

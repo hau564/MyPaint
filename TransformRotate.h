@@ -12,12 +12,14 @@ public:
 		
 		double dx = (x2 - x1) / 2, dy = (y2 - y1) / 2;
 		wxPoint2DDouble center((x1 + x2) / 2, (y1 + y2) / 2);
-
+		transformMatrix.TransformPoint(&center.m_x, &center.m_y);
+		
 		if (angle > 10) {
-			wxPoint2DDouble p = adjust;
-			transformMatrix.Invert();
-			transformMatrix.TransformDistance(&p.m_x, &p.m_y);
-			angle = atan2(p.m_x, dy - p.m_y);
+			wxPoint2DDouble rotate((x1 + x2) / 2, y1 - RotateArm);
+			transformMatrix.TransformPoint(&rotate.m_x, &rotate.m_y);
+			wxPoint2DDouble mouse = rotate + adjust;
+			angle =-atan2(mouse.m_x - center.m_x, mouse.m_y - center.m_y)
+				+ atan2(rotate.m_x - center.m_x, rotate.m_y - center.m_y);
 		}
 
 		if (abs(angle) <= 0.01) return matrix;
@@ -28,8 +30,9 @@ public:
 
 		return matrix;
 	}
-	void ModifyAdjust(wxPoint2DDouble adj) override
+	void Modify(wxPoint2DDouble p, wxPoint2DDouble adj) override
 	{
+		pos = p;
 		adjust = adj;
 		angle = 11;
 	}

@@ -1,38 +1,10 @@
-﻿  DrawingCanvas.cpp
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(43,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(61,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(62,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-  Editor.cpp
-  EditorDraw.cpp
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(43,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(61,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(62,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-  EditorMouse.cpp
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(43,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(61,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(62,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-  Layer.cpp
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(43,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(61,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(62,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-  MyFrame.cpp
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(43,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(61,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(62,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-  Object.cpp
-  Panel.cpp
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(43,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(61,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(62,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-  Path.cpp
-  SelectionBox.cpp
-  main.cpp
+﻿  EditorMouse.cpp
 C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(43,2): warning C4002: too many arguments for function-like macro invocation 'assert'
 C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(61,2): warning C4002: too many arguments for function-like macro invocation 'assert'
 C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(62,2): warning C4002: too many arguments for function-like macro invocation 'assert'
   Generating code
-  2 of 799 functions ( 0.3%) were compiled, the rest were copied from previous compilation.
-    1 functions were new in current compilation
-    8 functions had inline decision re-evaluated but remain unchanged
+  2 of 893 functions ( 0.2%) were compiled, the rest were copied from previous compilation.
+    0 functions were new in current compilation
+    6 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   MyPaint.vcxproj -> C:\Users\MAC_LENOVO\source\repos\MyPaint\x64\Release\MyPaint.exe

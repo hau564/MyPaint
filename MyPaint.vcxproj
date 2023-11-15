@@ -41,6 +41,7 @@
     <ClInclude Include="Action.h" />
     <ClInclude Include="ActionNewObject.h" />
     <ClInclude Include="ActionPane.h" />
+    <ClInclude Include="ActionTransform.h" />
     <ClInclude Include="ColorPane.h" />
     <ClInclude Include="DrawingCanvas.h" />
     <ClInclude Include="Editor.h" />
@@ -60,6 +61,7 @@
     <ClInclude Include="SizePane.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TransformMove.h" />
+    <ClInclude Include="TransformResize.h" />
     <ClInclude Include="TransformRotate.h" />
   </ItemGroup>
   <PropertyGroup Label="Globals">

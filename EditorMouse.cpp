@@ -15,14 +15,14 @@ EditorMouse::~EditorMouse()
 {
 	if (transform) delete transform;
 	for (auto object : objects)
-		object->selectionBox.selected = false;
+		object->selectionBox.SetSelected(false);
 }
 
 void EditorMouse::OnMouseDown(wxMouseEvent &event)
 {
 	mouseDown = event.GetPosition();
 	for (auto object : objects) {
-		if (object->selectionBox.selected) {
+		if (object->selectionBox.IsSelected()) {
 			transform = object->selectionBox.OnMouseDown(event);
 			if (transform) {
 				activeObject = object;
@@ -37,7 +37,7 @@ void EditorMouse::OnMouseDown(wxMouseEvent &event)
 			if (!ctrlHolding) {
 				for (auto p : objects)
 					if (p != object) {
-						p->selectionBox.selected = false;
+						p->selectionBox.SetSelected(false);
 					}
 			}
 			activeObject = object;
@@ -45,17 +45,17 @@ void EditorMouse::OnMouseDown(wxMouseEvent &event)
 		}
 	}
 
-	for (auto object : objects) object->selectionBox.selected = false;
+	for (auto object : objects) object->selectionBox.SetSelected(false);
 }
 
 void EditorMouse::OnMouseMove(wxMouseEvent &event)
 {
 	if (!transform) return;
-	transform->ModifyAdjust(event.GetPosition() - mouseDown);
+	transform->Modify(mouseDown, event.GetPosition() - mouseDown);
 
 	activeObject->selectionBox.DoTransform(transform);
 	for (auto object : objects) if (object != activeObject) {
-		if (object->selectionBox.selected)
+		if (object->selectionBox.IsSelected())
 			object->selectionBox.DoTransform(transform);
 	}
 }
@@ -63,10 +63,21 @@ void EditorMouse::OnMouseMove(wxMouseEvent &event)
 void EditorMouse::OnMouseUp(wxMouseEvent &event)
 {
 	if (!transform) return;
-	for (auto object : objects) {
-		object->selectionBox.CommitTransform();
+	if (abs(event.GetPosition().x - mouseDown.m_x) < 1 &&
+		abs(event.GetPosition().y - mouseDown.m_y) < 1) {
+		transform = nullptr;
+		return;
 	}
-	delete transform;
+
+	std::vector<Object*> selectedObjects;
+	for (auto object : objects) {
+		if (object->selectionBox.IsSelected()) {
+			selectedObjects.push_back(object);
+		}
+	}
+
+	parent->AddUndoneAction(new ActionTransform<Object>(selectedObjects, transform));
+
 	transform = nullptr;
 }
 

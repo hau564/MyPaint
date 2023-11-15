@@ -137,5 +137,11 @@
     <ClInclude Include="TransformRotate.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="TransformResize.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ActionTransform.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
   </ItemGroup>
 </Project>
