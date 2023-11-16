@@ -9,8 +9,6 @@ public:
 	{
 		wxAffineMatrix2D matrix;
 		wxPoint2DDouble p = adjust;
-		//transformMatrix.Invert();
-		//transformMatrix.TransformDistance(&p.m_x, &p.m_y);
 		matrix.Translate(p.m_x, p.m_y);
 		return matrix;
 	}

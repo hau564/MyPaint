@@ -13,6 +13,10 @@ public:
 		if (!object) return;
 		prevObject = object->prev;
 	};
+	~ActionNewObject() {
+		if (object) delete object;
+	}
+
 	void Undo() override {
 		object->EraseSelf();
 	}

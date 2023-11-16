@@ -21,7 +21,6 @@ void EditorDraw::OnMouseMove(wxMouseEvent &event)
 void EditorDraw::OnMouseUp(wxMouseEvent &event)
 {
 	if (!path) return;
-	//path->selectionBox.transform.Rotate(0.5);
 	parent->AddPath(path);
 	path = nullptr;
 }

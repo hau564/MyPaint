@@ -21,8 +21,7 @@ void SelectionBox::Draw(wxGraphicsContext* gc)
 	if (!selected) return;
 	gc->SetPen(wxPen(wxColour(200, 200, 200), 0.5));
 	gc->SetBrush(*wxWHITE_BRUSH);
-	gc->SetTransform(gc->CreateMatrix(wxAffineMatrix2D()));
-
+	
 	double dx = (x2 - x1) / 2, dy = (y2 - y1) / 2;
 	wxAffineMatrix2D tmatrix = GetTotalTransformMatrix();
 

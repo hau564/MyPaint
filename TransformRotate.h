@@ -30,7 +30,7 @@ public:
 
 		return matrix;
 	}
-	void Modify(wxPoint2DDouble p, wxPoint2DDouble adj) override
+	void Modify(wxPoint2DDouble p, wxPoint2DDouble adj, int holding = -1) override
 	{
 		pos = p;
 		adjust = adj;

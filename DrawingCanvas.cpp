@@ -99,12 +99,20 @@ void DrawingCanvas::OnExport(wxCommandEvent& event)
 
 void DrawingCanvas::OnUndo(wxCommandEvent& event)
 {
+	if (editor) {
+		wxMouseEvent e;
+		editor->OnMouseUp(e);
+	}
 	history->Undo();
 	Refresh();
 }
 
 void DrawingCanvas::OnRedo(wxCommandEvent& event)
 {
+	if (editor) {
+		wxMouseEvent e;
+		editor->OnMouseUp(e);
+	}
 	history->Redo();
 	Refresh();
 }

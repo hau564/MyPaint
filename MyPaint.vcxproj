@@ -35,6 +35,7 @@
     <ClCompile Include="Path.cpp" />
     <ClCompile Include="SelectablePane.cpp" />
     <ClCompile Include="SelectionBox.cpp" />
+    <ClCompile Include="ShapePane.cpp" />
     <ClCompile Include="SizePane.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -58,6 +59,7 @@
     <ClInclude Include="Path.h" />
     <ClInclude Include="SelectablePane.h" />
     <ClInclude Include="SelectionBox.h" />
+    <ClInclude Include="ShapePane.h" />
     <ClInclude Include="SizePane.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TransformMove.h" />

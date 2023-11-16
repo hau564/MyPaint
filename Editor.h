@@ -15,14 +15,15 @@ public:
 	Editor(DrawingCanvas *parent);
 	virtual ~Editor() {};
 
+	virtual void Touch() {};
+
 	virtual void OnMouseDown(wxMouseEvent &event) = 0;
 	virtual void OnMouseMove(wxMouseEvent &event) = 0;
-	virtual void OnMouseUp(wxMouseEvent &event) = 0;
+	virtual void OnMouseUp(wxMouseEvent &) = 0;
 	virtual void OnMouseLeave(wxMouseEvent &event) = 0;
 
 	virtual void OnKeyDown(wxKeyEvent& event) {};
 	virtual void OnKeyUp(wxKeyEvent &event) {};
-
 	virtual void Draw(wxGraphicsContext* gc) {};
 protected:
 	DrawingCanvas* parent;

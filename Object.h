@@ -6,7 +6,9 @@
 class Object
 {
 public:
-	virtual void Draw(wxGraphicsContext* gc) = 0;
+	virtual void DrawContent(wxGraphicsContext* gc);
+	virtual void DrawBox(wxGraphicsContext* gc);
+	virtual void Draw(wxGraphicsContext* gc);
 	virtual void BuildSelectionBox() = 0;
 
 public:

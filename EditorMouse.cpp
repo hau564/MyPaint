@@ -51,7 +51,7 @@ void EditorMouse::OnMouseDown(wxMouseEvent &event)
 void EditorMouse::OnMouseMove(wxMouseEvent &event)
 {
 	if (!transform) return;
-	transform->Modify(mouseDown, event.GetPosition() - mouseDown);
+	transform->Modify(mouseDown, event.GetPosition() - mouseDown, ctrlHolding ? WXK_CONTROL : -1);
 
 	activeObject->selectionBox.DoTransform(transform);
 	for (auto object : objects) if (object != activeObject) {
@@ -63,8 +63,8 @@ void EditorMouse::OnMouseMove(wxMouseEvent &event)
 void EditorMouse::OnMouseUp(wxMouseEvent &event)
 {
 	if (!transform) return;
-	if (abs(event.GetPosition().x - mouseDown.m_x) < 1 &&
-		abs(event.GetPosition().y - mouseDown.m_y) < 1) {
+	if (abs(transform->adjust.m_x) < 1 &&
+		abs(transform->adjust.m_y) < 1) {
 		transform = nullptr;
 		return;
 	}

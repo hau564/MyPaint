@@ -7,6 +7,7 @@ History::History(wxWindow* parent, Explorer* explorer)
 
 History::~History()
 {
+
 }
 
 void History::AddDoneAction(Action* action)
@@ -14,7 +15,7 @@ void History::AddDoneAction(Action* action)
 	while (actions.size() > pos + 1)
 	{
 		explorer->Remove((int)actions.size() - 1);
-		delete actions.back();
+		//delete actions.back();
 		actions.pop_back();
 	}
 

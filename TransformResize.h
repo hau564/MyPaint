@@ -35,7 +35,10 @@ public:
 			dy = typeY ? -y1 : -y2;
 			if (!f) ry = 1.0 + (typeY ? v.m_y : -v.m_y) / (y2 - y1);
 		}
-		f = 1;
+		if (!f) {
+			if (holdingKey == WXK_CONTROL && typeX != 1 && typeY != 1) rx = ry = std::max(rx, ry);
+			f = 1;
+		}
 
 		rotateMatrix.Invert();
 		matrix.Concat(rotateMatrix);
@@ -48,13 +51,14 @@ public:
 
 		return matrix;
 	}
-	void Modify(wxPoint2DDouble p, wxPoint2DDouble adj) override
+	void Modify(wxPoint2DDouble p, wxPoint2DDouble adj, int hold = -1) override
 	{
 		pos = p;
 		adjust = adj;
 		f = 0;
 		dx = dy = 0;
 		rx = ry = 1;
+		holdingKey = hold;
 	}
 
 	int typeX = 0, typeY = 0, f = 0;

@@ -19,7 +19,7 @@ public:
 	Path(wxColour color, int width);
 
 	void BuildSelectionBox() override;
-	void Draw(wxGraphicsContext* gc) override;
+	void DrawContent(wxGraphicsContext* gc) override;
 
 	void AddPoint(wxPoint2DDouble point);
 	
