@@ -15,7 +15,7 @@ wxColor ColorPane::GetColor() const
 	return color;
 }
 
-void ColorPane::DrawContent(wxGraphicsContext* gc, const wxRect& rect, int roundness) const
+void ColorPane::DrawContent(wxGraphicsContext* gc, const wxRect& rect, int roundness) 
 {
 	gc->SetPen(wxPen(color));
 	gc->SetBrush(wxBrush(color));

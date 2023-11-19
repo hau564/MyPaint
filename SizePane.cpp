@@ -15,7 +15,7 @@ int SizePane::GetWidth() const
 	return width;
 }
 
-void SizePane::DrawContent(wxGraphicsContext* gc, const wxRect& rect, int roundness) const
+void SizePane::DrawContent(wxGraphicsContext* gc, const wxRect& rect, int roundness)
 {
     gc->SetPen(*wxWHITE_PEN);
     gc->SetBrush(*wxWHITE_BRUSH);

@@ -13,7 +13,7 @@ public:
 	int GetWidth() const;
 
 private:
-	void DrawContent(wxGraphicsContext* gc, const wxRect& rect, int roundness) const override;
+	void DrawContent(wxGraphicsContext* gc, const wxRect& rect, int roundness) override;
 
 	int width;
 };

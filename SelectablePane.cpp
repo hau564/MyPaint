@@ -13,7 +13,7 @@ void SelectablePane::SetSelected(bool selected)
     Refresh();
 }
 
-void SelectablePane::DrawSelected(wxGraphicsContext* gc, const wxRect& selectionRect, int roundness) const
+void SelectablePane::DrawSelected(wxGraphicsContext* gc, const wxRect& selectionRect, int roundness) 
 {
     gc->SetPen(wxSystemSettings::GetAppearance().IsDark() ? *wxWHITE_PEN : *wxBLACK_PEN);
     gc->SetBrush(*wxTRANSPARENT_BRUSH);

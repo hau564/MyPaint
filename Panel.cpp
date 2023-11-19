@@ -9,14 +9,18 @@ Panel::Panel(wxWindow* parent, DrawingCanvas* _canvas, wxWindowID id, const wxPo
 	mainSizer = new wxBoxSizer(wxVERTICAL);
 
     SetupButtons();
-    SetupColorPanes();
+    SetupShapePanes();    
     SetupSizePanes();
-        
+    SetupColorPanes();
+    SetupBrushPanes();
 
     this->SetSizer(mainSizer);
     
     SelectColorPane(colorPanes[0]);
     SelectSizePane(sizePanes[0]);
+    SelectShapePane(shapePanes[0]);
+
+    SelectPaint();
 }
 
 void Panel::SetupButtons()
@@ -31,7 +35,7 @@ void Panel::SetupButtons()
         });
     shapeButton = new wxButton(this, wxID_ANY, "Shape");
     shapeButton->Bind(wxEVT_BUTTON, [this](wxCommandEvent& event) {
-        SelectPaint();
+        SelectShape();
         });
 
     buttonSizer = new wxWrapSizer(wxHORIZONTAL);
@@ -96,6 +100,65 @@ void Panel::SetupSizePanes()
     mainSizer->Add(sizePaneSizer, 0, wxALL, FromDIP(5));
 }
 
+void Panel::SetupShapePanes()
+{
+    shapeText = new wxStaticText(this, wxID_ANY, "Shapes");
+    mainSizer->Add(shapeText, 0, wxALL, FromDIP(5));
+
+    std::vector<std::vector<wxPoint2DDouble>> shapes = {
+        {{0, 0}, {0, 100}, {100, 100}, {100, 0}, {0, 0} },
+        {{0, 0}, {0, 50}, {50, 0}, {0, 0}},
+        {{50, 0}, {100, 50}, {50, 100}, {0, 50}, {50, 0} }
+    };
+
+    shapePaneSizer = new wxWrapSizer(wxHORIZONTAL);
+    
+    for (auto points : shapes) {
+        ShapePane *pane = new ShapePane(this, points);
+        pane->Bind(wxEVT_LEFT_DOWN, [this, pane](wxMouseEvent& event)
+        			{ SelectShapePane(pane); });
+        shapePaneSizer->Add(pane, 0, wxRIGHT | wxBOTTOM, FromDIP(5));
+        shapePanes.push_back(pane);
+    }
+
+    mainSizer->Add(shapePaneSizer, 0, wxALL, FromDIP(5));
+}
+
+void Panel::SetupBrushPanes()
+{
+    brushText = new wxStaticText(this, wxID_ANY, "Fill Colors");
+    mainSizer->Add(brushText, 0, wxALL, FromDIP(5));
+    brushPaneSizer = new wxWrapSizer(wxHORIZONTAL);
+    for (const auto& color : niceColors)
+    {
+        auto brushPane = new ColorPane(this, wxColour(color));
+
+        brushPane->Bind(wxEVT_LEFT_DOWN, [this, brushPane](wxMouseEvent& event)
+            { SelectBrushPane(brushPane); });
+
+        brushPanes.push_back(brushPane);
+        brushPaneSizer->Add(brushPane, 0, wxRIGHT | wxBOTTOM, FromDIP(5));
+    }
+
+    wxImage* customColorImage = new wxImage("data/customColorPane.png", wxBITMAP_TYPE_PNG);
+    customColorImage->Rescale(FromDIP(37), FromDIP(37));
+
+    brushPicker = new wxBitmapButton((wxWindow*)this, wxID_ANY, wxBitmap(*customColorImage));
+    brushPicker->Bind(wxEVT_BUTTON, [this](wxCommandEvent& event)
+        {
+            wxColourDialog dialog(this);
+            if (dialog.ShowModal() == wxID_OK)
+            {
+                wxColor color = dialog.GetColourData().GetColour();
+                //AddColor(new ColorPane(this, color));
+                SelectBrushPane(new ColorPane(nullptr, color));
+            }
+        });
+
+    brushPaneSizer->Add(brushPicker, 0, wxRIGHT | wxBOTTOM, FromDIP(5));
+    mainSizer->Add(brushPaneSizer, 0, wxALL, FromDIP(5));
+}
+
 
 
 void Panel::SelectColorPane(ColorPane* colorPane)
@@ -113,8 +176,25 @@ void Panel::SelectSizePane(SizePane* sizePane)
     {
         pane->SetSelected(pane == sizePane);
     }
-    canvas->SetMode(DrawingCanvas::DRAW);
     canvas->SetPenSize(sizePane->GetWidth());
+}
+
+void Panel::SelectShapePane(ShapePane* shapePane)
+{
+    for (auto& pane : shapePanes)
+    {
+		pane->SetSelected(pane == shapePane);
+	}
+    canvas->SetShape(shapePane->GetShape());
+}
+
+void Panel::SelectBrushPane(ColorPane* brushPane)
+{
+    for (auto& pane : brushPanes)
+    {
+		pane->SetSelected(pane->GetColor() == brushPane->GetColor());
+	}
+	canvas->SetBrushColor(brushPane->GetColor());
 }
 
 void Panel::Layout(int msk)
@@ -135,6 +215,22 @@ void Panel::Layout(int msk)
         mainSizer->Hide(sizeText);
         mainSizer->Hide(sizePaneSizer);
     }
+    if (msk & SHAPE) {
+        mainSizer->Show(shapeText);
+        mainSizer->Show(shapePaneSizer);
+    }
+    else {
+        mainSizer->Hide(shapeText);
+        mainSizer->Hide(shapePaneSizer);
+    }
+    if (msk & BRUSH) {
+		mainSizer->Show(brushText);
+		mainSizer->Show(brushPaneSizer);
+	}
+    else {
+		mainSizer->Hide(brushText);
+		mainSizer->Hide(brushPaneSizer);
+	}
     mainSizer->Layout();
 }
 
@@ -152,6 +248,6 @@ void Panel::SelectPaint()
 
 void Panel::SelectShape()
 {
-    Layout(COLOR | SIZE);
+    Layout(COLOR | SIZE | SHAPE | BRUSH);
 	canvas->SetMode(DrawingCanvas::SHAPE);
 }

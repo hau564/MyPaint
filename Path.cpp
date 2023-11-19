@@ -7,6 +7,11 @@ Path::Path(wxColour color, int width)
 	this->width = width;
 }
 
+Path::Path(std::vector<wxPoint2DDouble> points, wxColour color, int width)
+	: points(points), color(color), width(width)
+{
+}
+
 void Path::BuildSelectionBox()
 {
 	selectionBox.Build(points.size(), points.data(), width);

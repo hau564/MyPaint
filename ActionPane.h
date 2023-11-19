@@ -12,7 +12,7 @@ public:
 	ActionPane(wxWindow* parent, const Action* action, const int actionId, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
 	int GetId() const { return id; }
 private:
-	void DrawContent(wxGraphicsContext* gc, const wxRect& rect, int roundness) const override;
+	void DrawContent(wxGraphicsContext* gc, const wxRect& rect, int roundness) override;
 	const Action* action;
 	int id;
 };

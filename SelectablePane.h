@@ -23,8 +23,8 @@ public:
 
 
 protected:
-    virtual void DrawContent(wxGraphicsContext* gc, const wxRect& rect, int roundness) const = 0;
-    virtual void DrawSelected(wxGraphicsContext* gc, const wxRect& rect, int roundness) const;
+    virtual void DrawContent(wxGraphicsContext* gc, const wxRect& rect, int roundness) = 0;
+    virtual void DrawSelected(wxGraphicsContext* gc, const wxRect& rect, int roundness);
     bool selected = false;
 private:
     void OnPaint(wxPaintEvent& event);

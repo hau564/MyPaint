@@ -9,7 +9,8 @@ template <class T>
 class ActionNewObject : public Action
 {
 public:
-	ActionNewObject(Node<T> *object) : object(object) {
+	ActionNewObject(Node<T> *object, std::string name = "New Object") 
+	: Action(name), object(object) {
 		if (!object) return;
 		prevObject = object->prev;
 	};
@@ -22,9 +23,6 @@ public:
 	}
 	void Redo() override {
 		prevObject->InsertNext(object);
-	}
-	std::string GetName() const override {
-		return "New Object";
 	}
 
 private:

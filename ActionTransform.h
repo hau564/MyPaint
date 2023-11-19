@@ -9,8 +9,8 @@ template <class T>
 class ActionTransform : public Action
 {
 public:
-	ActionTransform(std::vector<T*> objects, Transform* transform) 
-		: objects(objects), transform(transform) {
+	ActionTransform(std::vector<T*> objects, Transform* transform, std::string name = "Transform Object")
+		: Action(name), objects(objects), transform(transform) {
 		for (auto object : objects)
 			memTransforms.push_back(object->selectionBox.GetBaseTransform());
 	};
@@ -31,9 +31,6 @@ public:
 			object->selectionBox.CommitTransform();
 			object->selectionBox.SetSelected(true);
 		}
-	}
-	std::string GetName() const override {
-		return "Transform Object";
 	}
 
 private:

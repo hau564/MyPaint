@@ -12,7 +12,7 @@ public:
 	wxColor GetColor() const;
 
 private:
-	void DrawContent(wxGraphicsContext* gc, const wxRect& rect, int roundness) const override;
+	void DrawContent(wxGraphicsContext* gc, const wxRect& rect, int roundness) override;
 
 	wxColor color;
 };

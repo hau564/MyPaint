@@ -1,14 +1,12 @@
 #pragma once
 
-#ifndef DRAWING_CANVAS_H
-#define DRAWING_CANVAS_H
-
 #include<wx/wx.h>
 #include<wx/graphics.h>
 #include <wx/dcbuffer.h>
 #include <wx/splitter.h>
 
 #include "Path.h"
+#include "Shape.h"
 #include "Layer.h"
 #include "History.h"
 
@@ -17,6 +15,7 @@
 
 #include "EditorDraw.h"
 #include "EditorMouse.h"
+#include "EditorShape.h"
 
 class DrawingCanvas : public wxWindow
 {
@@ -26,11 +25,15 @@ public:
 
     void SetExplorer(Explorer* explorer);
     void SetPenColor(wxColor color);
+    void SetBrushColor(wxColor color);
     void SetPenSize(int size);
+    void SetShape(Shape shape);
     void SetMode(int mode);
 
     wxColor GetPenColor() const { return penColor; }
+    wxColor GetBrushColor() const { return brushColor; }
     int GetPenSize() const { return penSize; }
+    Shape GetShape() const { return shape; }
 
     void OnExport(wxCommandEvent& event);
     void OnUndo(wxCommandEvent& event);
@@ -62,12 +65,12 @@ private:
 
 private:
     wxColor penColor = wxColor(0, 0, 0);
+    wxColor brushColor = wxColor(200, 200, 200);
     int penSize = 1;
+    Shape shape;
 
     std::vector<Layer*> layers;
     Layer* activeLayer;
     Editor* editor;
     History* history;
 };
-
-#endif // !DRAWING_CANVAS_H

@@ -25,6 +25,7 @@
     <ClCompile Include="Editor.cpp" />
     <ClCompile Include="EditorDraw.cpp" />
     <ClCompile Include="EditorMouse.cpp" />
+    <ClCompile Include="EditorShape.cpp" />
     <ClCompile Include="Explorer.cpp" />
     <ClCompile Include="History.cpp" />
     <ClCompile Include="Layer.cpp" />
@@ -35,6 +36,7 @@
     <ClCompile Include="Path.cpp" />
     <ClCompile Include="SelectablePane.cpp" />
     <ClCompile Include="SelectionBox.cpp" />
+    <ClCompile Include="Shape.cpp" />
     <ClCompile Include="ShapePane.cpp" />
     <ClCompile Include="SizePane.cpp" />
   </ItemGroup>
@@ -48,6 +50,7 @@
     <ClInclude Include="Editor.h" />
     <ClInclude Include="EditorDraw.h" />
     <ClInclude Include="EditorMouse.h" />
+    <ClInclude Include="EditorShape.h" />
     <ClInclude Include="Explorer.h" />
     <ClInclude Include="History.h" />
     <ClInclude Include="Layer.h" />
@@ -59,6 +62,7 @@
     <ClInclude Include="Path.h" />
     <ClInclude Include="SelectablePane.h" />
     <ClInclude Include="SelectionBox.h" />
+    <ClInclude Include="Shape.h" />
     <ClInclude Include="ShapePane.h" />
     <ClInclude Include="SizePane.h" />
     <ClInclude Include="Transform.h" />

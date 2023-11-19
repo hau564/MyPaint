@@ -6,7 +6,7 @@ ActionPane::ActionPane(wxWindow* parent, const Action* action, const int actionI
 	SetSelected(true);
 }
 
-void ActionPane::DrawContent(wxGraphicsContext* gc, const wxRect& rect, int roundness) const
+void ActionPane::DrawContent(wxGraphicsContext* gc, const wxRect& rect, int roundness)
 {
 	if (!selected) {
 		gc->SetPen(wxPen(wxColor(200, 200, 200), 0.5));

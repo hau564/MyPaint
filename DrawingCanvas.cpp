@@ -28,10 +28,14 @@ DrawingCanvas::~DrawingCanvas()
 }
 
 
-
 void DrawingCanvas::SetPenColor(wxColor color)
 {
 	penColor = color;
+}
+
+void DrawingCanvas::SetBrushColor(wxColor color)
+{
+	brushColor = color;
 }
 
 void DrawingCanvas::SetPenSize(int size)
@@ -39,18 +43,23 @@ void DrawingCanvas::SetPenSize(int size)
 	penSize = size;
 }
 
+void DrawingCanvas::SetShape(Shape shape)
+{
+	this->shape = shape;
+}
+
 void DrawingCanvas::SetMode(int mode)
 {
 	if (editor) delete editor;
 	editor = nullptr;
 
+	std::vector<Object*> paths;
 	switch (mode) {
 	case DRAW:
 		editor = new EditorDraw(this);
 		break;
 
 	case CURSOR:
-		std::vector<Object*> paths;
 		for (auto layer : layers) {
 			auto pathOfLayer = layer->GetVectorData();
 			for (auto path : pathOfLayer) {
@@ -58,6 +67,10 @@ void DrawingCanvas::SetMode(int mode)
 			}
 		}
 		editor = new EditorMouse(this, paths);
+		break;
+
+	case SHAPE:
+		editor = new EditorShape(this);
 		break;
 	}
 	Refresh();
