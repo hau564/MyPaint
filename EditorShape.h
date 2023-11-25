@@ -13,9 +13,13 @@ public:
 	void OnMouseUp(wxMouseEvent& event) override;
 	void OnMouseLeave(wxMouseEvent& event) override;
 
+	void OnKeyDown(wxKeyEvent& event) override;
+	void OnKeyUp(wxKeyEvent& event) override;
+
 	void Draw(wxGraphicsContext* gc) override;
 private:
 	Shape* shape;
 	double x1, x2, y1, y2;
+	bool ctrlHolding = 0;
 };
 

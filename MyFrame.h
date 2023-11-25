@@ -18,6 +18,7 @@ public:
 
     void OnKeyDown(wxKeyEvent& event);
     void OnKeyUp(wxKeyEvent& event);
+    void OnChar(wxKeyEvent& event);
 
 private:   
     void BuildMenuBar();
@@ -27,6 +28,7 @@ private:
     void OnUndo(wxCommandEvent& event);
     void OnRedo(wxCommandEvent& event);
     void OnHistory(wxCommandEvent& event);
+    void OnResetCanvas(wxCommandEvent& event);
 
 private:
     DrawingCanvas *canvas;

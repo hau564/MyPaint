@@ -15,6 +15,7 @@ public:
 	SelectionBox() {};
 
 	void Build(int n, wxPoint2DDouble* a, int width = 0);
+	void Build(double x, double y, double width, double height);
 	void Draw(wxGraphicsContext* gc);
 	Transform* OnMouseDown(wxMouseEvent &event);
 
@@ -28,6 +29,9 @@ public:
 	void CommitTransform();
 	wxAffineMatrix2D GetBaseTransform() const { return transformMatrix; }
 	wxAffineMatrix2D GetTotalTransformMatrix() const;
+
+	double GetX() const { return x1; }
+	double GetY() const { return y1; }
 
 	enum {
 		MOVE = 1,

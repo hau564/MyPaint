@@ -8,8 +8,11 @@ DrawingCanvas::DrawingCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos
 	this->Bind(wxEVT_LEFT_UP, &DrawingCanvas::onMouseUp, this);
 	this->Bind(wxEVT_MOTION, &DrawingCanvas::onMouseMove, this);
 	this->Bind(wxEVT_PAINT, &DrawingCanvas::onPaint, this);
-	this->Bind(wxEVT_LEAVE_WINDOW, &DrawingCanvas::onMouseUp, this);
-	
+	this->Bind(wxEVT_LEAVE_WINDOW, &DrawingCanvas::onMouseLeave, this);
+	this->Bind(wxEVT_MOUSEWHEEL, &DrawingCanvas::onMouseWheel, this);
+
+	canvasRect = wxRect2DDouble(0, 0, size.x, size.y);
+
 	layers.push_back(new Layer());
 	activeLayer = layers[0];
 }
@@ -50,6 +53,7 @@ void DrawingCanvas::SetShape(Shape shape)
 
 void DrawingCanvas::SetMode(int mode)
 {
+	this->mode = mode;
 	if (editor) delete editor;
 	editor = nullptr;
 
@@ -72,8 +76,17 @@ void DrawingCanvas::SetMode(int mode)
 	case SHAPE:
 		editor = new EditorShape(this);
 		break;
+
+	case TEXT:
+		editor = new EditorText(this);
+		break;
 	}
 	Refresh();
+}
+
+int DrawingCanvas::GetMode()
+{
+	return mode;
 }
 
 
@@ -82,6 +95,9 @@ void DrawingCanvas::SetMode(int mode)
 
 void DrawingCanvas::OnExport(wxCommandEvent& event)
 {
+	scaleMatrix = imatrix = wxAffineMatrix2D();
+	Refresh();
+
 	wxFileDialog saveFileDialog(this, _("Save drawing"), "", "",
 		"PNG files (*.png)|*.png|JPEG files (*.jpeg)|*.jpeg", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
@@ -130,12 +146,18 @@ void DrawingCanvas::OnRedo(wxCommandEvent& event)
 	Refresh();
 }
 
+void DrawingCanvas::OnReset(wxCommandEvent& event)
+{
+	scaleMatrix = imatrix = wxAffineMatrix2D();
+	Refresh();
+}
 
 
 
 
 
-void DrawingCanvas::AddPath(Path* path)
+
+void DrawingCanvas::AddPath(Object* path)
 {
 	if (!activeLayer) return;
 
@@ -150,10 +172,14 @@ void DrawingCanvas::AddUndoneAction(Action* action)
 	Refresh();
 }
 
-
+void DrawingCanvas::TransformEvent(wxMouseEvent& event) {
+	wxPoint2DDouble mousePos = imatrix.TransformPoint(event.GetPosition());
+	event.SetPosition({ (int)mousePos.m_x, (int)mousePos.m_y });
+}
 
 void DrawingCanvas::onMouseDown(wxMouseEvent& event)
 {
+	TransformEvent(event);
 	if (editor) {
 		editor->OnMouseDown(event);
 		Refresh();
@@ -162,6 +188,7 @@ void DrawingCanvas::onMouseDown(wxMouseEvent& event)
 
 void DrawingCanvas::onMouseUp(wxMouseEvent& event)
 {
+	TransformEvent(event);
 	if (editor) {
 		editor->OnMouseUp(event);
 		Refresh();
@@ -170,6 +197,7 @@ void DrawingCanvas::onMouseUp(wxMouseEvent& event)
 
 void DrawingCanvas::onMouseMove(wxMouseEvent& event)
 {
+	TransformEvent(event);
 	if (editor) {
 		editor->OnMouseMove(event);
 		Refresh();
@@ -178,6 +206,7 @@ void DrawingCanvas::onMouseMove(wxMouseEvent& event)
 
 void DrawingCanvas::onMouseLeave(wxMouseEvent& event)
 {
+	TransformEvent(event);
 	if (editor) {
 		editor->OnMouseLeave(event);
 		Refresh();
@@ -187,30 +216,130 @@ void DrawingCanvas::onMouseLeave(wxMouseEvent& event)
 void DrawingCanvas::onKeyDown(wxKeyEvent& event)
 {
 	if (editor) editor->OnKeyDown(event);
+	if (event.GetKeyCode() == WXK_CONTROL) {
+		ctrlHolding = true;
+	}
+	if (event.GetKeyCode() == WXK_ALT) {
+		altHolding = true;
+	}
+	Refresh();
 }
 
 void DrawingCanvas::onKeyUp(wxKeyEvent& event)
 {
 	if (editor) editor->OnKeyUp(event);
+	if (event.GetKeyCode() == WXK_CONTROL) {
+		ctrlHolding = false;
+	}
+	if (event.GetKeyCode() == WXK_ALT) {
+		altHolding = false;
+	}
+	Refresh();
+}
+
+void DrawingCanvas::onChar(wxKeyEvent& event)
+{
+	if (editor) editor->OnChar(event);
+	Refresh();
+}
+
+void DrawingCanvas::Scale(wxPoint2DDouble pos, double scale)
+{
+	if (scale < 0) return;
+	wxAffineMatrix2D matrix;
+
+	matrix.Translate(pos.m_x, pos.m_y);
+	matrix.Scale(scale, scale);
+	matrix.Translate(-pos.m_x, -pos.m_y);
+	matrix.Concat(scaleMatrix);
+	scaleMatrix = matrix;
+	imatrix = scaleMatrix;
+	imatrix.Invert();
+}
+
+void DrawingCanvas::Move(wxPoint2DDouble move)
+{
+	wxAffineMatrix2D matrix;
+	matrix.Translate(move.m_x, move.m_y);
+	matrix.Concat(scaleMatrix);
+	scaleMatrix = matrix;
+	imatrix = scaleMatrix;
+	imatrix.Invert();
+}
+
+void DrawingCanvas::onMouseWheel(wxMouseEvent& event)
+{
+	double x1 = 0, y1 = 0, x2 = GetSize().x, y2 = GetSize().y;
+	double width = x2, height = y2;
+	scaleMatrix.TransformPoint(&x1, &y1);
+	scaleMatrix.TransformPoint(&x2, &y2);
+
+
+	if (ctrlHolding) {
+		wxPoint2DDouble scalePoint = event.GetPosition();
+		double newScale = -1;
+		if (event.GetWheelRotation() > 0) {
+			double maxScale = 30;
+			if (x2 - x1 <= width * 30) {
+				newScale = std::min(1.1, width * 30 / (x2 - x1));
+			}
+		}
+		else {
+			if (x2 - x1 > width / 2) {
+				newScale = std::max(1.0 / 1.1, width / 2 / (x2 - x1));
+			}
+		}
+		Scale(scalePoint, newScale);
+		return;
+	}
+	wxPoint2DDouble move(0, 0);
+	int d = 20;
+	if (altHolding) {
+		if (event.GetWheelRotation() > 0) {
+			move.m_x = d;
+		}
+		else {
+			move.m_x = -d;
+		}
+	}
+	else {
+		if (event.GetWheelRotation() > 0) {
+			move.m_y = d;
+		}
+		else {
+			move.m_y = -d;
+		}
+	}
+	Move(move);
+	Refresh();
 }
 
 
 
 void DrawingCanvas::draw(wxGraphicsContext* gc)
 {
+	gc->PushState();
+	gc->SetTransform(gc->CreateMatrix(scaleMatrix));
+
+	gc->SetPen(wxPen(*wxWHITE, 0));
+	gc->SetBrush(*wxWHITE_BRUSH);
+	gc->DrawRectangle(0, 0, GetSize().x, GetSize().y);
+
 	for (Layer* layer : layers) {
 		layer->Draw(gc);
 	}
 	if (editor) editor->Draw(gc);
+	gc->PopState();
+
 }
 
 void DrawingCanvas::onPaint(wxPaintEvent&)
 {
 	wxAutoBufferedPaintDC dc(this);
-	dc.SetBackground(*wxWHITE_BRUSH);
+	dc.SetBackground(wxBrush(wxColor(200, 200, 200)));
 	dc.Clear();
 
-	wxGraphicsContext* gc = wxGraphicsContext::Create(dc);
+	wxGraphicsContext* gc = wxGraphicsContext::CreateFromUnknownDC(dc);
 	if (gc)
 	{
 		draw(gc);

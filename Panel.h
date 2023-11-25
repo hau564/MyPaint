@@ -14,6 +14,9 @@ class Panel : public wxScrolled<wxPanel>
 public:
 	Panel(wxWindow* parent, DrawingCanvas *canvas, wxWindowID id = wxID_ANY, const wxPoint& pos = wxDefaultPosition, const wxSize& size = wxDefaultSize);
 	
+	void OnKeyDown(wxKeyEvent& event);
+	void OnKeyUp(wxKeyEvent& event);
+
 private:
 	void SetupButtons();
 	void SetupColorPanes();
@@ -38,8 +41,10 @@ private:
 	void SelectMouse();
 	void SelectPaint();
 	void SelectShape();
+	void SelectText();
 
 private:
+	int lastMode;
 	DrawingCanvas* canvas;
 
 	wxBoxSizer* mainSizer;
@@ -47,6 +52,7 @@ private:
 	wxButton* mouseButton;
 	wxButton* paintButton;	
 	wxButton* shapeButton;	
+	wxButton* textButton;	
 	wxWrapSizer* buttonSizer;
 
 	std::vector<ColorPane*> colorPanes;

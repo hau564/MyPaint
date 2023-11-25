@@ -10,8 +10,6 @@
 MyFrame::MyFrame()
     : wxFrame(nullptr, wxID_ANY, "MyPaint")
 {
-    CreateStatusBar();
-    SetStatusText("hello");
     this->SetSize(FromDIP(800), FromDIP(500));
     this->SetMinSize({ FromDIP(400), FromDIP(200) });
 
@@ -52,6 +50,7 @@ void MyFrame::BuildMenuBar()
 
     wxMenu* viewMenu = new wxMenu;
     viewMenu->Append(wxID_FILE1, "&History\tCtrl+H");
+    viewMenu->Append(wxID_FILE2, "&Reset Canvas\tCtrl+R");
 
     wxMenuBar* menuBar = new wxMenuBar;
 
@@ -64,6 +63,7 @@ void MyFrame::BuildMenuBar()
     Bind(wxEVT_MENU, &MyFrame::OnUndo, this, wxID_UNDO);
     Bind(wxEVT_MENU, &MyFrame::OnRedo, this, wxID_REDO);
     Bind(wxEVT_MENU, &MyFrame::OnHistory, this, wxID_FILE1);
+    Bind(wxEVT_MENU, &MyFrame::OnResetCanvas, this, wxID_FILE2);
 }
 
 void MyFrame::OnExit(wxCommandEvent& event)
@@ -91,12 +91,24 @@ void MyFrame::OnHistory(wxCommandEvent& event)
     splitter2->SplitVertically(splitter, explorer, FromDIP(1300));
 }
 
+void MyFrame::OnResetCanvas(wxCommandEvent& event)
+{
+    canvas->OnReset(event);
+}
+
 void MyFrame::OnKeyDown(wxKeyEvent& event)
 {
     canvas->onKeyDown(event);
+    panel->OnKeyDown(event);
 }
 
 void MyFrame::OnKeyUp(wxKeyEvent& event)
 {
     canvas->onKeyUp(event);
+    panel->OnKeyUp(event);
+}
+
+void MyFrame::OnChar(wxKeyEvent& event)
+{
+    canvas->onChar(event);
 }

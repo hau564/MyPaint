@@ -16,6 +16,7 @@
 #include "EditorDraw.h"
 #include "EditorMouse.h"
 #include "EditorShape.h"
+#include "EditorText.h"
 
 class DrawingCanvas : public wxWindow
 {
@@ -29,6 +30,7 @@ public:
     void SetPenSize(int size);
     void SetShape(Shape shape);
     void SetMode(int mode);
+    int GetMode();
 
     wxColor GetPenColor() const { return penColor; }
     wxColor GetBrushColor() const { return brushColor; }
@@ -38,11 +40,14 @@ public:
     void OnExport(wxCommandEvent& event);
     void OnUndo(wxCommandEvent& event);
     void OnRedo(wxCommandEvent& event);
+    void OnReset(wxCommandEvent& event);
 
     void onKeyDown(wxKeyEvent& event);
     void onKeyUp(wxKeyEvent& event);
+    void onChar(wxKeyEvent& event);
+    void onMouseWheel(wxMouseEvent& event);
 
-    void AddPath(Path* path);
+    void AddPath(Object* path);
     void AddUndoneAction(Action* action);
 
     enum {
@@ -57,6 +62,10 @@ private:
 
     void draw(wxGraphicsContext* gc);
 
+    void TransformEvent(wxMouseEvent &event);
+    void Scale(wxPoint2DDouble pos, double scale);
+    void Move(wxPoint2DDouble move);
+
     void onMouseDown(wxMouseEvent&);
     void onMouseUp(wxMouseEvent&);
     void onPaint(wxPaintEvent&);
@@ -64,6 +73,9 @@ private:
     void onMouseLeave(wxMouseEvent& event);
 
 private:
+    int mode = CURSOR;
+    wxRect2DDouble canvasRect;
+
     wxColor penColor = wxColor(0, 0, 0);
     wxColor brushColor = wxColor(200, 200, 200);
     int penSize = 1;
@@ -73,4 +85,7 @@ private:
     Layer* activeLayer;
     Editor* editor;
     History* history;
+
+    bool ctrlHolding = false, altHolding = 0;
+    wxAffineMatrix2D scaleMatrix, imatrix;
 };

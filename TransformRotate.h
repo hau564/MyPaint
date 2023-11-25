@@ -15,8 +15,11 @@ public:
 		transformMatrix.TransformPoint(&center.m_x, &center.m_y);
 		
 		if (angle > 10) {
-			wxPoint2DDouble rotate((x1 + x2) / 2, y1 - RotateArm);
-			transformMatrix.TransformPoint(&rotate.m_x, &rotate.m_y);
+			wxPoint2DDouble topMid = transformMatrix.TransformPoint({ x1 + dx, y1 });
+			wxPoint2DDouble midToTop = topMid - transformMatrix.TransformPoint({ x1 + dx, y1 + dy });
+			double len = sqrt(midToTop.m_x * midToTop.m_x + midToTop.m_y * midToTop.m_y);
+			wxPoint2DDouble rotate = topMid + midToTop / len * RotateArm;
+
 			wxPoint2DDouble mouse = rotate + adjust;
 			angle =-atan2(mouse.m_x - center.m_x, mouse.m_y - center.m_y)
 				+ atan2(rotate.m_x - center.m_x, rotate.m_y - center.m_y);

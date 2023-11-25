@@ -26,6 +26,7 @@
     <ClCompile Include="EditorDraw.cpp" />
     <ClCompile Include="EditorMouse.cpp" />
     <ClCompile Include="EditorShape.cpp" />
+    <ClCompile Include="EditorText.cpp" />
     <ClCompile Include="Explorer.cpp" />
     <ClCompile Include="History.cpp" />
     <ClCompile Include="Layer.cpp" />
@@ -39,6 +40,7 @@
     <ClCompile Include="Shape.cpp" />
     <ClCompile Include="ShapePane.cpp" />
     <ClCompile Include="SizePane.cpp" />
+    <ClCompile Include="Text.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Action.h" />
@@ -51,6 +53,7 @@
     <ClInclude Include="EditorDraw.h" />
     <ClInclude Include="EditorMouse.h" />
     <ClInclude Include="EditorShape.h" />
+    <ClInclude Include="EditorText.h" />
     <ClInclude Include="Explorer.h" />
     <ClInclude Include="History.h" />
     <ClInclude Include="Layer.h" />
@@ -65,6 +68,7 @@
     <ClInclude Include="Shape.h" />
     <ClInclude Include="ShapePane.h" />
     <ClInclude Include="SizePane.h" />
+    <ClInclude Include="Text.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TransformMove.h" />
     <ClInclude Include="TransformResize.h" />

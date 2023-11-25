@@ -9,6 +9,7 @@ public:
     bool OnInit() override;
     void OnKeyDown(wxKeyEvent& event);
     void OnKeyUp(wxKeyEvent& event);
+    void OnChar(wxKeyEvent& event);
     DECLARE_EVENT_TABLE()
 };
 
@@ -17,6 +18,7 @@ wxIMPLEMENT_APP(MyApp);
 BEGIN_EVENT_TABLE(MyApp, wxApp)
     EVT_KEY_DOWN(MyApp::OnKeyDown)
     EVT_KEY_UP(MyApp::OnKeyUp)
+    //EVT_CHAR_HOOK(MyApp::OnChar)
 END_EVENT_TABLE()
 
 bool MyApp::OnInit()
@@ -34,4 +36,9 @@ void MyApp::OnKeyDown(wxKeyEvent& event)
 void MyApp::OnKeyUp(wxKeyEvent& event)
 {
     frame->OnKeyUp(event);
+}
+
+void MyApp::OnChar(wxKeyEvent& event)
+{
+    frame->OnChar(event);
 }

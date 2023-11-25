@@ -75,6 +75,12 @@
     <ClCompile Include="EditorShape.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="Text.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="EditorText.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DrawingCanvas.h">
@@ -159,6 +165,12 @@
       <Filter>Source Files</Filter>
     </ClInclude>
     <ClInclude Include="Shape.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="Text.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="EditorText.h">
       <Filter>Source Files</Filter>
     </ClInclude>
   </ItemGroup>

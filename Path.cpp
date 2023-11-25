@@ -18,13 +18,14 @@ void Path::BuildSelectionBox()
 }
 
 void Path::DrawContent(wxGraphicsContext* gc) {
-	//gc->SetTransform(gc->CreateMatrix(selectionBox.GetTotalTransformMatrix()));
 	std::vector<wxPoint2DDouble> p = points;
 	for (auto& point : p) {
 		point = selectionBox.GetTotalTransformMatrix().TransformPoint(point);
 	}
+	//gc->SetTransform(gc->CreateMatrix(selectionBox.GetTotalTransformMatrix()));
 	gc->SetPen(wxPen(color, width));
 	gc->StrokeLines(p.size(), p.data());
+	//gc->SetTransform(gc->CreateMatrix(wxAffineMatrix2D()));
 }
 
 void Path::AddPoint(wxPoint2DDouble point)

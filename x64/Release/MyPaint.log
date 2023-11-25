@@ -1,18 +1,10 @@
-﻿  MyFrame.cpp
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(43,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(61,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(62,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-  Panel.cpp
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(43,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(61,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(62,2): warning C4002: too many arguments for function-like macro invocation 'assert'
-  main.cpp
+﻿  Panel.cpp
 C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(43,2): warning C4002: too many arguments for function-like macro invocation 'assert'
 C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(61,2): warning C4002: too many arguments for function-like macro invocation 'assert'
 C:\Users\MAC_LENOVO\source\repos\MyPaint\Node.h(62,2): warning C4002: too many arguments for function-like macro invocation 'assert'
   Generating code
-  11 of 1084 functions ( 1.0%) were compiled, the rest were copied from previous compilation.
+  12 of 1161 functions ( 1.0%) were compiled, the rest were copied from previous compilation.
     0 functions were new in current compilation
-    1 functions had inline decision re-evaluated but remain unchanged
+    0 functions had inline decision re-evaluated but remain unchanged
   Finished generating code
   MyPaint.vcxproj -> C:\Users\MAC_LENOVO\source\repos\MyPaint\x64\Release\MyPaint.exe

@@ -27,7 +27,12 @@ void EditorShape::OnMouseMove(wxMouseEvent& event)
 
 	x2 = event.GetX();
 	y2 = event.GetY();
-	shape->ScaleToRect(wxRect(x1, y1, x2 - x1, y2 - y1));
+	if (!ctrlHolding)
+		shape->ScaleToRect(wxRect(x1, y1, x2 - x1, y2 - y1));
+	else {
+		double c = std::max(abs(x2 - x1), abs(y2 - y1));
+		shape->ScaleToRect(wxRect(x1, y1, x2 > x1 ? c : -c, y2 > y1 ? c : -c));
+	}
 }
 
 void EditorShape::OnMouseUp(wxMouseEvent& event)
@@ -40,6 +45,20 @@ void EditorShape::OnMouseUp(wxMouseEvent& event)
 void EditorShape::OnMouseLeave(wxMouseEvent& event)
 {
 	OnMouseUp(event);
+}
+
+void EditorShape::OnKeyDown(wxKeyEvent& event)
+{
+	if (event.GetKeyCode() == WXK_CONTROL) {
+		ctrlHolding = true;
+	}
+}
+
+void EditorShape::OnKeyUp(wxKeyEvent& event)
+{
+	if (event.GetKeyCode() == WXK_CONTROL) {
+		ctrlHolding = false;
+	}
 }
 
 void EditorShape::Draw(wxGraphicsContext* gc)

@@ -19,8 +19,35 @@ Panel::Panel(wxWindow* parent, DrawingCanvas* _canvas, wxWindowID id, const wxPo
     SelectColorPane(colorPanes[0]);
     SelectSizePane(sizePanes[0]);
     SelectShapePane(shapePanes[0]);
+    SelectBrushPane(brushPanes[0]);
 
     SelectPaint();
+}
+
+void Panel::OnKeyDown(wxKeyEvent& event)
+{
+    if (event.GetKeyCode() == WXK_SHIFT)    {
+        if (canvas->GetMode() == DrawingCanvas::CURSOR) return;
+        lastMode = canvas->GetMode();
+		SelectMouse();
+	}
+}
+
+void Panel::OnKeyUp(wxKeyEvent& event)
+{
+    if (event.GetKeyCode() == WXK_SHIFT) {
+        switch (lastMode) {
+            case DrawingCanvas::DRAW:
+				SelectPaint();
+				break;
+        	case DrawingCanvas::SHAPE:
+                SelectShape();
+                break;
+            case DrawingCanvas::TEXT:
+                SelectText();
+				break;
+        }
+    }
 }
 
 void Panel::SetupButtons()
@@ -38,10 +65,17 @@ void Panel::SetupButtons()
         SelectShape();
         });
 
+    textButton = new wxButton(this, wxID_ANY, "Text");
+    textButton->Bind(wxEVT_BUTTON, [this](wxCommandEvent& event) {
+        SelectText();
+        });
+
+
     buttonSizer = new wxWrapSizer(wxHORIZONTAL);
     buttonSizer->Add(mouseButton, 0, wxALL, FromDIP(5));
     buttonSizer->Add(paintButton, 0, wxALL, FromDIP(5));
     buttonSizer->Add(shapeButton, 0, wxALL, FromDIP(5));
+    buttonSizer->Add(textButton, 0, wxALL, FromDIP(5));
 
     mainSizer->Add(buttonSizer, 0, wxALL, FromDIP(5));
 }
@@ -110,6 +144,21 @@ void Panel::SetupShapePanes()
         {{0, 0}, {0, 50}, {50, 0}, {0, 0}},
         {{50, 0}, {100, 50}, {50, 100}, {0, 50}, {50, 0} }
     };
+
+    //circle
+    shapes.push_back(std::vector<wxPoint2DDouble>());
+    double pi = acos(-1);
+    for (double a = -pi; a <= pi; a += 0.01) {
+        shapes.back().push_back({ 50 + 50 * cos(a), 50 + 50 * sin(a) });
+    }
+
+    //star
+    shapes.push_back(std::vector<wxPoint2DDouble>());
+    double b = pi / 10;
+    for (double a = -pi * 3 / 2; a <= pi / 2 + 0.000001; a += (pi * 2) / 5) {
+		shapes.back().push_back({ 50 + 50 * cos(a + pi), 50 + 50 * sin(a + pi) });
+		//shapes.back().push_back({ 50 + 25 * cos(a + pi + b), 50 + 25 * sin(a + pi + b) });
+	}
 
     shapePaneSizer = new wxWrapSizer(wxHORIZONTAL);
     
@@ -250,4 +299,10 @@ void Panel::SelectShape()
 {
     Layout(COLOR | SIZE | SHAPE | BRUSH);
 	canvas->SetMode(DrawingCanvas::SHAPE);
+}
+
+void Panel::SelectText()
+{
+    Layout(SIZE | COLOR);
+	canvas->SetMode(DrawingCanvas::TEXT);
 }

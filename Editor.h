@@ -24,6 +24,8 @@ public:
 
 	virtual void OnKeyDown(wxKeyEvent& event) {};
 	virtual void OnKeyUp(wxKeyEvent &event) {};
+	virtual void OnChar(wxKeyEvent &event) {};
+
 	virtual void Draw(wxGraphicsContext* gc) {};
 protected:
 	DrawingCanvas* parent;

@@ -16,6 +16,16 @@ void SelectionBox::Build(int n, wxPoint2DDouble* a, int width)
 	bound = wxRect2DDouble(x1 - width / 2, y1 - width / 2, x2 - x1 + width, y2 - y1 + width);
 }
 
+void SelectionBox::Build(double x, double y, double width, double height)
+{
+	x1 = x;
+	y1 = y;
+	x2 = x + width;
+	y2 = y + height;
+	width = 1;
+	bound = wxRect2DDouble(x1 - width / 2, y1 - width / 2, x2 - x1 + width, y2 - y1 + width);
+}
+
 void SelectionBox::Draw(wxGraphicsContext* gc)
 {
 	if (!selected) return;
@@ -62,6 +72,8 @@ Transform* SelectionBox::OnMouseDown(wxMouseEvent& event)
 	wxPoint2DDouble pos = transformMatrix.TransformPoint(originalPos);
 	transformMatrix.Invert();
 
+	wxAffineMatrix2D tmatrix = GetTotalTransformMatrix();
+
 	if (!selected) {
 		if (bound.Contains(pos)) {
 			selected = 1;
@@ -79,8 +91,11 @@ Transform* SelectionBox::OnMouseDown(wxMouseEvent& event)
 	for (int i = 0; i < 3; ++i) {
 		for (int j = 0; j < 3; ++j) {
 			if (i == 1 && j == 1) continue;
-			wxRect2DDouble rect(x1 + dx * i - r, y1 + dy * j - r, 2 * r, 2 * r);
-			if (rect.Contains(pos)) {
+			wxPoint2DDouble p(x1 + dx * i, y1 + dy * j);
+			tmatrix.TransformPoint(&p.m_x, &p.m_y);
+			wxRect2DDouble rect(p.m_x - r, p.m_y - r, 2 * r, 2 * r);
+			//wxRect2DDouble rect(x1 + dx * i - r, y1 + dy * j - r, 2 * r, 2 * r);
+			if (rect.Contains(originalPos)) {
 				TransformResize* t = new TransformResize;
 				t->typeX = i;
 				t->typeY = j;
