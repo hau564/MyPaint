@@ -19,10 +19,12 @@ public:
 	}
 
 	void Undo() override {
+		object->data->showing = false;
 		object->EraseSelf();
 	}
 	void Redo() override {
 		prevObject->InsertNext(object);
+		object->data->showing = true;
 	}
 
 private:

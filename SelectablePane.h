@@ -20,13 +20,16 @@ public:
     }
 
     void SetSelected(bool selected);
-
+    bool IsSelected();
 
 protected:
     virtual void DrawContent(wxGraphicsContext* gc, const wxRect& rect, int roundness) = 0;
     virtual void DrawSelected(wxGraphicsContext* gc, const wxRect& rect, int roundness);
-    bool selected = false;
+    virtual void DrawFocus(wxGraphicsContext* gc, const wxRect& rect, int roundness);
+    bool selected = false, focus = false;
 private:
+    void OnMouseMove(wxMouseEvent& event);
+    void OnMouseLeave(wxMouseEvent& event);
     void OnPaint(wxPaintEvent& event);
 };
 

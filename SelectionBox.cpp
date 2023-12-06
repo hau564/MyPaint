@@ -6,6 +6,8 @@ void SelectionBox::Build(int n, wxPoint2DDouble* a, int width)
 	if (!n) return;
 	x1 = x2 = a[0].m_x;
 	y1 = y2 = a[0].m_y;
+	x2 += 1;
+	y2 += 1;
 	for (int i = 0; i < n; ++i) {
 		x1 = std::min(x1, a[i].m_x);
 		x2 = std::max(x2, a[i].m_x);

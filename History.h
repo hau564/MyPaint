@@ -20,11 +20,13 @@ public:
 	void Redo();
 	void SetTo(int i);
 
+	void Hide();
+
 protected:
 	std::vector<Action*> actions;
 	int pos;
-	Explorer *explorer;
 	wxWindow *parent;
+	Explorer *explorer;
 };
 
 #endif // !HISTORY_H

@@ -5,10 +5,11 @@ EditorMouse::EditorMouse(DrawingCanvas* parent, std::vector<Object*> _objects)
 	:Editor(parent), objects(_objects)
 {
 	for (auto object : objects) object->BuildSelectionBox();
-	std::sort(objects.begin(), objects.end(),
+	std::reverse(objects.begin(), objects.end());
+	/*std::sort(objects.begin(), objects.end(),
 		[&](const Object* a, const Object* b) {
 			return a->selectionBox.GetArea() < b->selectionBox.GetArea();
-		});
+		});*/
 }
 
 EditorMouse::~EditorMouse()
@@ -22,6 +23,7 @@ void EditorMouse::OnMouseDown(wxMouseEvent &event)
 {
 	mouseDown = event.GetPosition();
 	for (auto object : objects) {
+		if (!object->showing) continue;
 		if (object->selectionBox.IsSelected()) {
 			transform = object->selectionBox.OnMouseDown(event);
 			if (transform) {
@@ -32,6 +34,7 @@ void EditorMouse::OnMouseDown(wxMouseEvent &event)
 	}
 
 	for (auto object : objects) {
+		if (!object->showing) continue;
 		transform = object->selectionBox.OnMouseDown(event);
 		if (transform) {
 			if (!ctrlHolding) {
@@ -55,6 +58,7 @@ void EditorMouse::OnMouseMove(wxMouseEvent &event)
 
 	activeObject->selectionBox.DoTransform(transform);
 	for (auto object : objects) if (object != activeObject) {
+		if (!object->showing) continue;
 		if (object->selectionBox.IsSelected())
 			object->selectionBox.DoTransform(transform);
 	}
@@ -71,6 +75,7 @@ void EditorMouse::OnMouseUp(wxMouseEvent &event)
 
 	std::vector<Object*> selectedObjects;
 	for (auto object : objects) {
+		if (!object->showing) continue;
 		if (object->selectionBox.IsSelected()) {
 			selectedObjects.push_back(object);
 		}

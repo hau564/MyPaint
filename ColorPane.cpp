@@ -18,7 +18,9 @@ wxColor ColorPane::GetColor() const
 void ColorPane::DrawContent(wxGraphicsContext* gc, const wxRect& rect, int roundness) 
 {
 	gc->SetPen(wxPen(color));
-	gc->SetBrush(wxBrush(color));
+	if (color.Alpha() != 255)
+		gc->SetPen(wxPen(wxColour(200, 200, 200), 1));
 
+	gc->SetBrush(wxBrush(color));
 	gc->DrawRoundedRectangle(rect.GetX(), rect.GetY(), rect.GetWidth(), rect.GetHeight(), roundness);
 }

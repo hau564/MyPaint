@@ -58,3 +58,8 @@ void History::SetTo(int i)
 	while (pos < i) Redo();
 	parent->Refresh();
 }
+
+void History::Hide()
+{
+	explorer->SetSize(explorer->GetSize().x, 0);
+}

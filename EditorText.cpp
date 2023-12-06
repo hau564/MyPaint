@@ -47,13 +47,17 @@ void EditorText::OnKeyDown(wxKeyEvent& event)
         }
         else
         {
-            
+            if (event.GetKeyCode() == WXK_BACK) {
+                text->Pop();
+            }
+            return;
         }
     }
 
     if (event.GetKeyCode() == WXK_BACK) {
 		text->Pop();
 	}
+    event.Skip();
 }
 
 void EditorText::OnChar(wxKeyEvent& event)

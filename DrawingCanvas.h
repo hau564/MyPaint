@@ -21,7 +21,7 @@
 class DrawingCanvas : public wxWindow
 {
 public:
-    DrawingCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size);
+    DrawingCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int width = 800, int height = 600);
     ~DrawingCanvas();
 
     void SetExplorer(Explorer* explorer);
@@ -31,6 +31,7 @@ public:
     void SetShape(Shape shape);
     void SetMode(int mode);
     int GetMode();
+    void TransformCanvas(int id);
 
     wxColor GetPenColor() const { return penColor; }
     wxColor GetBrushColor() const { return brushColor; }
@@ -41,6 +42,7 @@ public:
     void OnUndo(wxCommandEvent& event);
     void OnRedo(wxCommandEvent& event);
     void OnReset(wxCommandEvent& event);
+    void Reset();
 
     void onKeyDown(wxKeyEvent& event);
     void onKeyUp(wxKeyEvent& event);
@@ -49,6 +51,8 @@ public:
 
     void AddPath(Object* path);
     void AddUndoneAction(Action* action);
+
+    void FinishDrawing();
 
     enum {
         CURSOR = 1,
@@ -71,10 +75,15 @@ private:
     void onPaint(wxPaintEvent&);
     void onMouseMove(wxMouseEvent& event);
     void onMouseLeave(wxMouseEvent& event);
+    void onZoom(wxCommandEvent& event);
 
 private:
+    int width, height;
+    wxPoint2DDouble paperPos;
+
     int mode = CURSOR;
-    wxRect2DDouble canvasRect;
+    wxMouseEvent lastEvent;
+    wxComboBox *zoomComboBox;
 
     wxColor penColor = wxColor(0, 0, 0);
     wxColor brushColor = wxColor(200, 200, 200);

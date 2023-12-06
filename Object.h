@@ -13,5 +13,6 @@ public:
 
 public:
 	SelectionBox selectionBox;
+	bool showing = true;
 };
 

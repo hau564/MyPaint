@@ -7,6 +7,7 @@
 #include "ColorPane.h"
 #include "ShapePane.h"
 #include "SizePane.h"
+#include "ImagePane.h"
 #include "Shape.h"
 
 class Panel : public wxScrolled<wxPanel>
@@ -19,6 +20,7 @@ public:
 
 private:
 	void SetupButtons();
+	void SetupMouseButtons();
 	void SetupColorPanes();
 	void SetupSizePanes();	
 	void SetupShapePanes();
@@ -26,6 +28,7 @@ private:
 
 	void SelectColorPane(ColorPane* colorPane);
 	void SelectSizePane(SizePane* sizePane);
+	void SelectSizePane(int size);
 	void SelectShapePane(ShapePane* shapePane);
 	void SelectBrushPane(ColorPane* brushPane);
 	
@@ -33,27 +36,32 @@ private:
 		COLOR = 1,
 		SIZE = 2,
 		SHAPE = 4,
-		BRUSH = 8
+		BRUSH = 8,
+		FUNCTION = 16
 	};
 
 	void Layout(int msk);
 
+	void SelectMode(ImagePane* pane);
 	void SelectMouse();
 	void SelectPaint();
 	void SelectShape();
 	void SelectText();
 
 private:
+	bool shifting;
+
 	int lastMode;
 	DrawingCanvas* canvas;
 
 	wxBoxSizer* mainSizer;
 
-	wxButton* mouseButton;
-	wxButton* paintButton;	
-	wxButton* shapeButton;	
-	wxButton* textButton;	
+	std::vector<ImagePane*> buttonPanes;
 	wxWrapSizer* buttonSizer;
+
+	wxStaticText* functionText;
+	std::vector<ImagePane*> functionPanes;
+	wxWrapSizer* functionSizer;
 
 	std::vector<ColorPane*> colorPanes;
 	wxWrapSizer* colorPaneSizer;
@@ -65,6 +73,7 @@ private:
 	wxStaticText* brushText;
 	wxBitmapButton* brushPicker;
 
+	wxSlider* penSlider;
 	std::vector<SizePane*> sizePanes;
 	wxWrapSizer* sizePaneSizer;
 	wxStaticText * sizeText;

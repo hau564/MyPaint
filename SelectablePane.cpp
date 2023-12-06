@@ -5,6 +5,8 @@ SelectablePane::SelectablePane(wxWindow* parent, wxWindowID id, const wxPoint& p
 {
     this->SetBackgroundStyle(wxBG_STYLE_PAINT);
     Bind(wxEVT_PAINT, &SelectablePane::OnPaint, this);
+    Bind(wxEVT_MOTION, &SelectablePane::OnMouseMove, this);
+    Bind(wxEVT_LEAVE_WINDOW, &SelectablePane::OnMouseLeave, this);
 }
 
 void SelectablePane::SetSelected(bool selected)
@@ -13,11 +15,35 @@ void SelectablePane::SetSelected(bool selected)
     Refresh();
 }
 
+bool SelectablePane::IsSelected()
+{
+    return selected;
+}
+
 void SelectablePane::DrawSelected(wxGraphicsContext* gc, const wxRect& selectionRect, int roundness) 
 {
     gc->SetPen(wxSystemSettings::GetAppearance().IsDark() ? *wxWHITE_PEN : *wxBLACK_PEN);
     gc->SetBrush(*wxTRANSPARENT_BRUSH);
     gc->DrawRoundedRectangle(selectionRect.GetX(), selectionRect.GetY(), selectionRect.GetWidth(), selectionRect.GetHeight(), roundness);
+}
+
+void SelectablePane::DrawFocus(wxGraphicsContext* gc, const wxRect& selectionRect, int roundness)
+{
+    gc->SetPen(*wxLIGHT_GREY_PEN);
+    gc->SetBrush(*wxTRANSPARENT_BRUSH);
+    gc->DrawRoundedRectangle(selectionRect.GetX(), selectionRect.GetY(), selectionRect.GetWidth(), selectionRect.GetHeight(), roundness);
+}
+
+void SelectablePane::OnMouseMove(wxMouseEvent& event)
+{
+    focus = 1;
+    Refresh();
+}
+
+void SelectablePane::OnMouseLeave(wxMouseEvent& event)
+{
+    focus = 0;
+    Refresh();
 }
 
 void SelectablePane::OnPaint(wxPaintEvent& event)
@@ -43,6 +69,10 @@ void SelectablePane::OnPaint(wxPaintEvent& event)
         {
             DrawSelected(gc, selectionRect, roundness);
         }
+        else if (focus)
+        {
+			DrawFocus(gc, selectionRect, roundness);
+		}
 
         delete gc;
     }

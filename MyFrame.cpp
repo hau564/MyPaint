@@ -21,7 +21,7 @@ MyFrame::MyFrame()
     explorer = new Explorer(splitter2, wxID_ANY, wxDefaultPosition, wxDefaultSize);
     canvas->SetExplorer(explorer);
 
-    splitter->SplitVertically(panel, canvas, FromDIP(200));
+    splitter->SplitVertically(panel, canvas, FromDIP(260));
     splitter->SetMinimumPaneSize(FromDIP(100));
 
     splitter2->SplitVertically(splitter, explorer, FromDIP(1300));

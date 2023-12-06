@@ -1,7 +1,7 @@
 #include "DrawingCanvas.h"
 
-DrawingCanvas::DrawingCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size)
-	:wxWindow(parent, id, pos, size)
+DrawingCanvas::DrawingCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int width, int height)
+	:wxWindow(parent, id, pos, size), width(width), height(height)
 {
 	this->SetBackgroundStyle(wxBG_STYLE_PAINT);
 	this->Bind(wxEVT_LEFT_DOWN, &DrawingCanvas::onMouseDown, this);
@@ -10,8 +10,18 @@ DrawingCanvas::DrawingCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos
 	this->Bind(wxEVT_PAINT, &DrawingCanvas::onPaint, this);
 	this->Bind(wxEVT_LEAVE_WINDOW, &DrawingCanvas::onMouseLeave, this);
 	this->Bind(wxEVT_MOUSEWHEEL, &DrawingCanvas::onMouseWheel, this);
-
-	canvasRect = wxRect2DDouble(0, 0, size.x, size.y);
+	
+	paperPos = wxPoint2DDouble(150, 100);
+	Reset();
+	//zoom
+	wxArrayString zoomList;
+	for (int i = 25; i <= 200; i += 25) {
+		zoomList.Add(wxString::Format("%d%%", i));
+	}
+	zoomList.Add("400%");
+	zoomComboBox = new wxComboBox(this, wxID_ANY, "100%", wxDefaultPosition, wxDefaultSize, zoomList, wxCB_READONLY);
+	zoomComboBox->SetSelection(3);
+	zoomComboBox->Bind(wxEVT_COMBOBOX, &DrawingCanvas::onZoom, this);
 
 	layers.push_back(new Layer());
 	activeLayer = layers[0];
@@ -89,6 +99,29 @@ int DrawingCanvas::GetMode()
 	return mode;
 }
 
+void DrawingCanvas::TransformCanvas(int id)
+{
+	wxAffineMatrix2D matrix;
+	wxPoint2DDouble center = scaleMatrix.TransformPoint(wxPoint2DDouble(GetSize().x / 2, GetSize().y / 2));
+	matrix.Translate(center.m_x, center.m_y);
+	switch (id) {
+	case 0:
+		matrix.Rotate(acos(-1) / 2);
+		break;
+	case 1:
+		matrix.Scale(-1, 1);
+		break;
+	case 2:
+		matrix.Scale(1, -1);
+		break;
+	}
+	matrix.Translate(-center.m_x, -center.m_y);
+	matrix.Concat(scaleMatrix);
+	imatrix = scaleMatrix = matrix;
+	imatrix.Invert();
+	Refresh();
+}
+
 
 
 
@@ -101,10 +134,12 @@ void DrawingCanvas::OnExport(wxCommandEvent& event)
 	wxFileDialog saveFileDialog(this, _("Save drawing"), "", "",
 		"PNG files (*.png)|*.png|JPEG files (*.jpeg)|*.jpeg", wxFD_SAVE | wxFD_OVERWRITE_PROMPT);
 
-	if (saveFileDialog.ShowModal() == wxID_CANCEL)
+	if (saveFileDialog.ShowModal() == wxID_CANCEL) {
+		Reset();
 		return;
+	}
 
-	wxBitmap bitmap(this->GetSize() * this->GetContentScaleFactor());
+	wxBitmap bitmap(width, height);
 
 	wxMemoryDC memDC;
 
@@ -124,6 +159,8 @@ void DrawingCanvas::OnExport(wxCommandEvent& event)
 
 	bitmap.SaveFile(saveFileDialog.GetPath(), wxBITMAP_TYPE_PNG);
 	bitmap.SaveFile(saveFileDialog.GetPath(), wxBITMAP_TYPE_JPEG);
+
+	Reset();
 }
 
 void DrawingCanvas::OnUndo(wxCommandEvent& event)
@@ -148,7 +185,14 @@ void DrawingCanvas::OnRedo(wxCommandEvent& event)
 
 void DrawingCanvas::OnReset(wxCommandEvent& event)
 {
+	Reset();
+}
+
+void DrawingCanvas::Reset()
+{
 	scaleMatrix = imatrix = wxAffineMatrix2D();
+	scaleMatrix.Translate(paperPos.m_x, paperPos.m_y);
+	imatrix.Translate(-paperPos.m_x, -paperPos.m_y);
 	Refresh();
 }
 
@@ -172,7 +216,13 @@ void DrawingCanvas::AddUndoneAction(Action* action)
 	Refresh();
 }
 
+void DrawingCanvas::FinishDrawing()
+{
+	onMouseUp(lastEvent);
+}
+
 void DrawingCanvas::TransformEvent(wxMouseEvent& event) {
+	lastEvent = event;
 	wxPoint2DDouble mousePos = imatrix.TransformPoint(event.GetPosition());
 	event.SetPosition({ (int)mousePos.m_x, (int)mousePos.m_y });
 }
@@ -211,6 +261,14 @@ void DrawingCanvas::onMouseLeave(wxMouseEvent& event)
 		editor->OnMouseLeave(event);
 		Refresh();
 	}
+}
+
+void DrawingCanvas::onZoom(wxCommandEvent& event)
+{
+	std::string str = zoomComboBox->GetValue().ToStdString();
+	int zoom = std::stoi(str);
+	scaleMatrix = imatrix = wxAffineMatrix2D();
+	Scale(wxPoint2DDouble(GetSize().x / 2, GetSize().y / 2), 1.0 * zoom / 100.0);
 }
 
 void DrawingCanvas::onKeyDown(wxKeyEvent& event)
@@ -318,12 +376,14 @@ void DrawingCanvas::onMouseWheel(wxMouseEvent& event)
 
 void DrawingCanvas::draw(wxGraphicsContext* gc)
 {
+	zoomComboBox->SetPosition(wxPoint(GetSize().x - zoomComboBox->GetSize().x, 0));
 	gc->PushState();
 	gc->SetTransform(gc->CreateMatrix(scaleMatrix));
 
 	gc->SetPen(wxPen(*wxWHITE, 0));
 	gc->SetBrush(*wxWHITE_BRUSH);
-	gc->DrawRectangle(0, 0, GetSize().x, GetSize().y);
+	gc->DrawRectangle(0, 0, width, height);
+	//gc->Clip(0, 0, GetSize().x, GetSize().y);
 
 	for (Layer* layer : layers) {
 		layer->Draw(gc);

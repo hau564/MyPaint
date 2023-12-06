@@ -29,6 +29,7 @@
     <ClCompile Include="EditorText.cpp" />
     <ClCompile Include="Explorer.cpp" />
     <ClCompile Include="History.cpp" />
+    <ClCompile Include="ImagePane.cpp" />
     <ClCompile Include="Layer.cpp" />
     <ClCompile Include="main.cpp" />
     <ClCompile Include="MyFrame.cpp" />
@@ -56,6 +57,7 @@
     <ClInclude Include="EditorText.h" />
     <ClInclude Include="Explorer.h" />
     <ClInclude Include="History.h" />
+    <ClInclude Include="ImagePane.h" />
     <ClInclude Include="Layer.h" />
     <ClInclude Include="List.h" />
     <ClInclude Include="MyFrame.h" />

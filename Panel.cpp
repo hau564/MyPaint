@@ -8,7 +8,9 @@ Panel::Panel(wxWindow* parent, DrawingCanvas* _canvas, wxWindowID id, const wxPo
 
 	mainSizer = new wxBoxSizer(wxVERTICAL);
 
+    wxInitAllImageHandlers();
     SetupButtons();
+    SetupMouseButtons();
     SetupShapePanes();    
     SetupSizePanes();
     SetupColorPanes();
@@ -20,64 +22,121 @@ Panel::Panel(wxWindow* parent, DrawingCanvas* _canvas, wxWindowID id, const wxPo
     SelectSizePane(sizePanes[0]);
     SelectShapePane(shapePanes[0]);
     SelectBrushPane(brushPanes[0]);
-
+    SelectMode(buttonPanes[1]);
     SelectPaint();
 }
 
 void Panel::OnKeyDown(wxKeyEvent& event)
 {
-    if (event.GetKeyCode() == WXK_SHIFT)    {
-        if (canvas->GetMode() == DrawingCanvas::CURSOR) return;
-        lastMode = canvas->GetMode();
-		SelectMouse();
+    if (event.GetKeyCode() == WXK_TAB) {
+        if (!shifting) {
+            if (canvas->GetMode() == DrawingCanvas::CURSOR) return;
+            shifting = 1;
+            lastMode = canvas->GetMode();
+            canvas->FinishDrawing();
+        
+            SelectMode(buttonPanes[0]);
+		    SelectMouse();
+        }
+        else {
+            shifting = 0;
+            switch (lastMode) {
+                case DrawingCanvas::DRAW:
+                    SelectMode(buttonPanes[1]);
+				    SelectPaint();
+				    break;
+        	    case DrawingCanvas::SHAPE:
+                    SelectMode(buttonPanes[2]);
+                    SelectShape();
+                    break;
+                case DrawingCanvas::TEXT:
+                    SelectMode(buttonPanes[3]);
+                    SelectText();
+				    break;
+                case DrawingCanvas::CURSOR:
+                    SelectMode(buttonPanes[0]);
+					SelectMouse();
+					break;
+            }
+        }
 	}
 }
-
 void Panel::OnKeyUp(wxKeyEvent& event)
 {
-    if (event.GetKeyCode() == WXK_SHIFT) {
-        switch (lastMode) {
-            case DrawingCanvas::DRAW:
-				SelectPaint();
-				break;
-        	case DrawingCanvas::SHAPE:
-                SelectShape();
-                break;
-            case DrawingCanvas::TEXT:
-                SelectText();
-				break;
-        }
-    }
+
 }
 
 void Panel::SetupButtons()
 {
-    mouseButton = new wxButton(this, wxID_ANY, "Mouse");
-    mouseButton->Bind(wxEVT_BUTTON, [this](wxCommandEvent& event) {
-        SelectMouse();
-        });
-    paintButton = new wxButton(this, wxID_ANY, "Pen");
-    paintButton->Bind(wxEVT_BUTTON, [this](wxCommandEvent& event) {
-        SelectPaint();
-        });
-    shapeButton = new wxButton(this, wxID_ANY, "Shape");
-    shapeButton->Bind(wxEVT_BUTTON, [this](wxCommandEvent& event) {
-        SelectShape();
-        });
-
-    textButton = new wxButton(this, wxID_ANY, "Text");
-    textButton->Bind(wxEVT_BUTTON, [this](wxCommandEvent& event) {
-        SelectText();
-        });
-
-
     buttonSizer = new wxWrapSizer(wxHORIZONTAL);
-    buttonSizer->Add(mouseButton, 0, wxALL, FromDIP(5));
-    buttonSizer->Add(paintButton, 0, wxALL, FromDIP(5));
-    buttonSizer->Add(shapeButton, 0, wxALL, FromDIP(5));
-    buttonSizer->Add(textButton, 0, wxALL, FromDIP(5));
 
+    auto mouse = new ImagePane(this, "data/mouse.png");
+    mouse->Bind(wxEVT_LEFT_DOWN, [this, mouse](wxMouseEvent& event)
+        {
+            SelectMode(mouse);
+            SelectMouse();
+        });
+    buttonSizer->Add(mouse, 0, wxRIGHT | wxBOTTOM, FromDIP(5));
+
+    auto pen = new ImagePane(this, "data/pen.png");
+    pen->Bind(wxEVT_LEFT_DOWN, [this, pen](wxMouseEvent& event)
+        {
+            SelectMode(pen);
+            SelectPaint();
+        });
+    buttonSizer->Add(pen, 0, wxRIGHT | wxBOTTOM, FromDIP(5));
+
+    auto shape = new ImagePane(this, "data/shape.png");
+    shape->Bind(wxEVT_LEFT_DOWN, [this, shape](wxMouseEvent& event)
+    		{
+            SelectMode(shape);
+            SelectShape();
+        });
+    buttonSizer->Add(shape, 0, wxRIGHT | wxBOTTOM, FromDIP(5));
+
+    auto text = new ImagePane(this, "data/text.png");
+    text->Bind(wxEVT_LEFT_DOWN, [this, text](wxMouseEvent& event)
+    	{
+                SelectMode(text);
+            SelectText();
+        });
+    buttonSizer->Add(text, 0, wxRIGHT | wxBOTTOM, FromDIP(5));
+    buttonPanes = { mouse, pen, shape, text };
     mainSizer->Add(buttonSizer, 0, wxALL, FromDIP(5));
+}
+
+void Panel::SetupMouseButtons()
+{
+    functionText = new wxStaticText(this, wxID_ANY, "Tools");
+    mainSizer->Add(functionText, 0, wxALL, FromDIP(5));
+    functionSizer = new wxWrapSizer(wxHORIZONTAL);
+    
+    ImagePane *rotate = new ImagePane(this, "data/rotate.png");
+    rotate->Bind(wxEVT_LEFT_DOWN, [this, rotate](wxMouseEvent& event) {
+			canvas->TransformCanvas(0);
+            rotate->SetSelected(1);
+		});
+    functionSizer->Add(rotate, 0, wxRIGHT | wxBOTTOM, FromDIP(5));
+
+    ImagePane *hflip = new ImagePane(this, "data/hflip.png");
+    hflip->Bind(wxEVT_LEFT_DOWN, [this, hflip](wxMouseEvent& event) {
+        canvas->TransformCanvas(1);
+        hflip->SetSelected(1);
+        });
+    functionSizer->Add(hflip, 0, wxRIGHT | wxBOTTOM, FromDIP(5));
+
+    ImagePane *vflip = new ImagePane(this, "data/vflip.png");
+    vflip->Bind(wxEVT_LEFT_DOWN, [this, vflip](wxMouseEvent& event) {
+		canvas->TransformCanvas(2);
+		vflip->SetSelected(1);
+		});
+    functionSizer->Add(vflip, 0, wxRIGHT | wxBOTTOM, FromDIP(5));
+
+    for (auto pane : { rotate, hflip, vflip })
+        pane->Bind(wxEVT_LEFT_UP, [this, pane](wxMouseEvent& event)
+        			{ pane->SetSelected(0); });
+
+    mainSizer->Add(functionSizer, 0, wxALL, FromDIP(5));
 }
 
 void Panel::SetupColorPanes()
@@ -96,9 +155,8 @@ void Panel::SetupColorPanes()
         colorPaneSizer->Add(colorPane, 0, wxRIGHT | wxBOTTOM, FromDIP(5));
     }
 
-    wxInitAllImageHandlers();
     wxImage* customColorImage = new wxImage("data/customColorPane.png", wxBITMAP_TYPE_PNG);
-    customColorImage->Rescale(FromDIP(37), FromDIP(37));
+    customColorImage->Rescale(colorPanes[0]->GetSize().x, colorPanes[0]->GetSize().y);
 
     colorPicker = new wxBitmapButton((wxWindow*)this, wxID_ANY, wxBitmap(*customColorImage));
     colorPicker->Bind(wxEVT_BUTTON, [this](wxCommandEvent& event)
@@ -123,7 +181,7 @@ void Panel::SetupSizePanes()
 
     sizePaneSizer = new wxWrapSizer(wxHORIZONTAL);
 
-    for (int i = 1; i <= 9; i++)
+    for (int i = 1; i <= 10; i++)
     {
 		auto sizePane = new SizePane(this, i * 2);
 		sizePane->Bind(wxEVT_LEFT_DOWN, [this, sizePane](wxMouseEvent& event)
@@ -131,7 +189,17 @@ void Panel::SetupSizePanes()
 		sizePanes.push_back(sizePane);
         sizePaneSizer->Add(sizePane, 0, wxRIGHT | wxBOTTOM, FromDIP(5));
 	}
+
     mainSizer->Add(sizePaneSizer, 0, wxALL, FromDIP(5));
+
+    wxSlider* slider = new wxSlider(this, wxID_ANY, 1, 1, 100, wxDefaultPosition, wxDefaultSize, wxSL_HORIZONTAL | wxSL_LABELS);
+    slider->Bind(wxEVT_SLIDER, [this, slider](wxCommandEvent& event)
+        {
+            SelectSizePane(slider->GetValue());
+        });
+    penSlider = slider;
+    mainSizer->Add(slider, 0, wxEXPAND | wxALL, FromDIP(5));
+
 }
 
 void Panel::SetupShapePanes()
@@ -141,7 +209,7 @@ void Panel::SetupShapePanes()
 
     std::vector<std::vector<wxPoint2DDouble>> shapes = {
         {{0, 0}, {0, 100}, {100, 100}, {100, 0}, {0, 0} },
-        {{0, 0}, {0, 50}, {50, 0}, {0, 0}},
+        {{25, 0}, {50, 50}, {0, 50}, {25, 0}},
         {{50, 0}, {100, 50}, {50, 100}, {0, 50}, {50, 0} }
     };
 
@@ -149,16 +217,27 @@ void Panel::SetupShapePanes()
     shapes.push_back(std::vector<wxPoint2DDouble>());
     double pi = acos(-1);
     for (double a = -pi; a <= pi; a += 0.01) {
-        shapes.back().push_back({ 50 + 50 * cos(a), 50 + 50 * sin(a) });
+        shapes.back().push_back({ 50.0 + 50.0 * cos(a), 50.0 + 50.0 * sin(a) });
+    }
+
+    //5
+    shapes.push_back(std::vector<wxPoint2DDouble>());
+    for (double a = -pi / 2; a <= pi * 3 / 2 + 0.000001; a += (pi * 2) / 5) {
+        shapes.back().push_back({ 50.0 + 50.0 * cos(a), 50.0 + 50.0 * sin(a) });
+    }
+    //6
+    shapes.push_back(std::vector<wxPoint2DDouble>());
+    for (double a = -pi / 2; a <= pi * 3 / 2 + 0.000001; a += (pi * 2) / 6) {
+        shapes.back().push_back({ 50.0 + 50.0 * cos(a), 50.0 + 50.0 * sin(a) });
     }
 
     //star
     shapes.push_back(std::vector<wxPoint2DDouble>());
-    double b = pi / 10;
-    for (double a = -pi * 3 / 2; a <= pi / 2 + 0.000001; a += (pi * 2) / 5) {
-		shapes.back().push_back({ 50 + 50 * cos(a + pi), 50 + 50 * sin(a + pi) });
-		//shapes.back().push_back({ 50 + 25 * cos(a + pi + b), 50 + 25 * sin(a + pi + b) });
-	}
+    double b = pi / 5;
+    for (double a = -pi / 2; a <= pi * 3 / 2 + 0.000001; a += (pi * 2) / 5) {
+        shapes.back().push_back({ 50.0 + 50.0 * cos(a), 50.0 + 50.0 * sin(a) });
+        shapes.back().push_back({ 50.0 + 25.0 * cos(a + b), 50.0 + 25.0 * sin(a + b) });
+    }
 
     shapePaneSizer = new wxWrapSizer(wxHORIZONTAL);
     
@@ -189,8 +268,14 @@ void Panel::SetupBrushPanes()
         brushPaneSizer->Add(brushPane, 0, wxRIGHT | wxBOTTOM, FromDIP(5));
     }
 
+    auto colorPane = new ColorPane(this, wxColour(-1, -1, -1, 0));
+    colorPane->Bind(wxEVT_LEFT_DOWN, [this, colorPane](wxMouseEvent& event)
+        { SelectBrushPane(colorPane); });
+    brushPanes.push_back(colorPane);
+    brushPaneSizer->Add(colorPane, 0, wxRIGHT | wxBOTTOM, FromDIP(5));
+
     wxImage* customColorImage = new wxImage("data/customColorPane.png", wxBITMAP_TYPE_PNG);
-    customColorImage->Rescale(FromDIP(37), FromDIP(37));
+    customColorImage->Rescale(brushPanes[0]->GetSize().x, brushPanes[0]->GetSize().x);
 
     brushPicker = new wxBitmapButton((wxWindow*)this, wxID_ANY, wxBitmap(*customColorImage));
     brushPicker->Bind(wxEVT_BUTTON, [this](wxCommandEvent& event)
@@ -221,11 +306,17 @@ void Panel::SelectColorPane(ColorPane* colorPane)
 
 void Panel::SelectSizePane(SizePane* sizePane)
 {
+    SelectSizePane(sizePane->GetWidth());
+}
+
+void Panel::SelectSizePane(int size)
+{
     for (auto& pane : sizePanes)
     {
-        pane->SetSelected(pane == sizePane);
-    }
-    canvas->SetPenSize(sizePane->GetWidth());
+		pane->SetSelected(pane->GetWidth() == size);
+	}
+    penSlider->SetValue(size);
+	canvas->SetPenSize(size);
 }
 
 void Panel::SelectShapePane(ShapePane* shapePane)
@@ -259,10 +350,12 @@ void Panel::Layout(int msk)
     if (msk & SIZE) {
 		mainSizer->Show(sizeText);
 		mainSizer->Show(sizePaneSizer);
+        mainSizer->Show(penSlider);
 	}
     else {
         mainSizer->Hide(sizeText);
         mainSizer->Hide(sizePaneSizer);
+        mainSizer->Hide(penSlider);
     }
     if (msk & SHAPE) {
         mainSizer->Show(shapeText);
@@ -280,12 +373,26 @@ void Panel::Layout(int msk)
 		mainSizer->Hide(brushText);
 		mainSizer->Hide(brushPaneSizer);
 	}
+    if (msk & FUNCTION) {
+		mainSizer->Show(functionText);
+        mainSizer->Show(functionSizer);
+	}
+    else {
+        mainSizer->Hide(functionText);
+		mainSizer->Hide(functionSizer);
+	}
     mainSizer->Layout();
+}
+
+void Panel::SelectMode(ImagePane* pane)
+{
+    for (auto& p : buttonPanes)
+        p->SetSelected(p == pane);
 }
 
 void Panel::SelectMouse()
 {
-    Layout(0);
+    Layout(FUNCTION);
 	canvas->SetMode(DrawingCanvas::CURSOR);
 }
 
