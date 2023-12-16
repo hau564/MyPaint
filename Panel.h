@@ -8,7 +8,10 @@
 #include "ShapePane.h"
 #include "SizePane.h"
 #include "ImagePane.h"
+#include "GradientPane.h"
+#include "ImageGradientPane.h"
 #include "Shape.h"
+#include "gradientdlg.h"
 
 class Panel : public wxScrolled<wxPanel>
 {
@@ -21,23 +24,29 @@ public:
 private:
 	void SetupButtons();
 	void SetupMouseButtons();
+	void SetupColorPicker(ImagePane *colorPicker, std::function<void(wxColor)> SelectColor);
 	void SetupColorPanes();
 	void SetupSizePanes();	
 	void SetupShapePanes();
 	void SetupBrushPanes();
+	void SetupGradientPanes();
 
 	void SelectColorPane(ColorPane* colorPane);
+	void SelectColorPane(wxColor color);
 	void SelectSizePane(SizePane* sizePane);
 	void SelectSizePane(int size);
 	void SelectShapePane(ShapePane* shapePane);
 	void SelectBrushPane(ColorPane* brushPane);
+	void SelectBrushPane(wxColor color);
+	void SelectGradientPane(GradientPane* gradientPane);
 	
 	enum {
 		COLOR = 1,
 		SIZE = 2,
 		SHAPE = 4,
 		BRUSH = 8,
-		FUNCTION = 16
+		FUNCTION = 16,
+		GRADIENT = 32
 	};
 
 	void Layout(int msk);
@@ -66,12 +75,17 @@ private:
 	std::vector<ColorPane*> colorPanes;
 	wxWrapSizer* colorPaneSizer;
 	wxStaticText* colorText;
-	wxBitmapButton* colorPicker;
+	ImagePane* colorPicker;
 
 	std::vector<ColorPane*> brushPanes;
 	wxWrapSizer* brushPaneSizer;
 	wxStaticText* brushText;
-	wxBitmapButton* brushPicker;
+	ImagePane* brushPicker;
+
+	std::vector<GradientPane*> gradientPanes;
+	wxWrapSizer* gradientPaneSizer;
+	wxStaticText* gradientText;
+
 
 	wxSlider* penSlider;
 	std::vector<SizePane*> sizePanes;

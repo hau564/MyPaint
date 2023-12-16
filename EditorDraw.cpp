@@ -30,6 +30,13 @@ void EditorDraw::OnMouseLeave(wxMouseEvent &event)
 	OnMouseUp(event);
 }
 
+void EditorDraw::Finish()
+{
+	if (!path) return;
+	parent->AddPath(path);
+	path = nullptr;
+}
+
 void EditorDraw::Draw(wxGraphicsContext* gc)
 {
 	if (path) path->Draw(gc);

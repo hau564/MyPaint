@@ -18,7 +18,10 @@ public:
 public:
 	wxColour fillColor;
 	std::vector<wxPoint2DDouble> mpoints;
+	bool isGradient = false;
+	wxGraphicsGradientStops stops;
 private:
 	double x1, x2, y1, y2;
+	wxRect2DDouble scale_rect;
 };
 

@@ -32,3 +32,8 @@ void Path::AddPoint(wxPoint2DDouble point)
 {
 	points.push_back(point);
 }
+
+void Path::AddPoint(double x, double y)
+{
+	points.push_back(wxPoint2DDouble(x, y));
+}

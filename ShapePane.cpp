@@ -12,12 +12,12 @@ void ShapePane::DrawContent(wxGraphicsContext* gc, const wxRect& rect, int round
 	gc->SetBrush(*wxWHITE_BRUSH);
 
 	Shape s = *shape;
-	s.DrawOnRect(gc, wxRect(rect.GetX() + d, rect.GetY() + d, rect.GetWidth() - 2 * d, rect.GetHeight() - 2 * d), roundness);
+	s.DrawOnRect(gc, wxRect(rect.GetX() + d, rect.GetY() + d, rect.GetWidth() - 2 * d, rect.GetWidth() - 2 * d), roundness);
 }
 
 void ShapePane::DrawSelected(wxGraphicsContext* gc, const wxRect& rect, int roundness)
 {
 	Shape s = *shape;
 	s.width = 3;
-	s.DrawOnRect(gc, wxRect(rect.GetX() + d, rect.GetY() + d, rect.GetWidth() - 2 * d, rect.GetHeight() - 2 * d), roundness);
+	s.DrawOnRect(gc, wxRect(rect.GetX() + d, rect.GetY() + d, rect.GetWidth() - 2 * d, rect.GetWidth() - 2 * d), roundness);
 }

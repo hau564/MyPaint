@@ -15,6 +15,7 @@ public:
 	void OnMouseMove(wxMouseEvent &event) override;
 	void OnMouseUp(wxMouseEvent &event) override;
 	void OnMouseLeave(wxMouseEvent &event) override;
+	void Finish() override;
 
 	void Draw(wxGraphicsContext* gc) override;
 private:

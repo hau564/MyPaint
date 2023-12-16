@@ -25,7 +25,22 @@ void Text::DrawContent(wxGraphicsContext* gc)
 	gc->SetTransform(matrix);
 	gc->SetFont(font, color);
 	gc->DrawText(text, pos.m_x, pos.m_y);
-	gc->GetTextExtent(text, &width, &height);
+
+	double w = 0;
+	std::string t = "";
+	for (char c : text) {
+		if (c == '\n') {
+			gc->GetTextExtent(t, &w, &height);
+			width = std::max(width, w);
+			t.clear();
+		}
+		else
+			t += c;
+	}
+	gc->GetTextExtent(t, &w, &height);
+	width = std::max(width, w);
+
+	gc->GetTextExtent(text, &w, &height);
 	gc->PopState();
 }
 

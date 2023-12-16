@@ -84,6 +84,24 @@
     <ClCompile Include="ImagePane.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="gradient.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="gradientdlg.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GradientBrush.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ToolsSelection.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="GradientPane.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="ImageGradientPane.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="DrawingCanvas.h">
@@ -179,5 +197,26 @@
     <ClInclude Include="ImagePane.h">
       <Filter>Source Files</Filter>
     </ClInclude>
+    <ClInclude Include="gradient.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="gradientdlg.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GradientBrush.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ToolsSelection.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="GradientPane.h">
+      <Filter>Source Files</Filter>
+    </ClInclude>
+    <ClInclude Include="ImageGradientPane.h">
+      <Filter>Source Files\Header Files</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="diagram.md" />
   </ItemGroup>
 </Project>

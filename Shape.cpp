@@ -1,5 +1,5 @@
 #include "Shape.h"
-
+#include "GradientBrush.h"
 Shape::Shape(std::vector<wxPoint2DDouble> points, wxColour color, wxColour fillColor, int width)
 	: Path(points, color, width), fillColor(fillColor), mpoints(points)
 {
@@ -26,6 +26,7 @@ void Shape::ScaleToRect(const wxRect& rect)
 		point.m_x = (point.m_x - x1) * (1.0 * rect.GetWidth() / (x2 - x1)) + rect.GetX();
 		point.m_y = (point.m_y - y1) * (1.0 * rect.GetHeight() / (y2 - y1)) + rect.GetY();
 	}
+	scale_rect = wxRect2DDouble(rect.GetX(), rect.GetY(), rect.GetWidth(), rect.GetHeight());
 }
 
 
@@ -33,12 +34,15 @@ void Shape::ScaleToRect(const wxRect& rect)
 void Shape::DrawContent(wxGraphicsContext* gc)
 {
 	wxGraphicsPath fpath = gc->CreatePath();
-	fpath.MoveToPoint(selectionBox.GetTotalTransformMatrix().TransformPoint(points[0]));
+	wxAffineMatrix2D matrix = selectionBox.GetTotalTransformMatrix();
+	fpath.MoveToPoint(matrix.TransformPoint(points[0]));
 	for (int i = 1; i < points.size(); i++) {
-		fpath.AddLineToPoint(selectionBox.GetTotalTransformMatrix().TransformPoint(points[i]));
+		fpath.AddLineToPoint(matrix.TransformPoint(points[i]));
 	}
 	gc->SetPen(color);
 	gc->SetBrush(fillColor);
+	if (isGradient)
+		gc->SetBrush(Gradient::CreateBrush(gc, &matrix, scale_rect, stops));
 	gc->DrawPath(fpath);
 	
 	Path::DrawContent(gc);

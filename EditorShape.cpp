@@ -1,5 +1,6 @@
 #include "EditorShape.h"
 #include "DrawingCanvas.h"
+#include "GradientBrush.h"
 
 EditorShape::EditorShape(DrawingCanvas* parent)
 	:Editor(parent)
@@ -14,6 +15,12 @@ void EditorShape::OnMouseDown(wxMouseEvent& event)
 	shape->width = parent->GetPenSize();
 	shape->fillColor = parent->GetBrushColor();
 
+	if (parent->IsGradient()) {
+		shape->isGradient = true;
+		shape->stops = parent->GetGradientStops();
+	}
+	shape->stops = parent->GetGradientStops();
+	
 	x1 = event.GetX();
 	y1 = event.GetY();
 	x2 = x1 + 1;
@@ -27,7 +34,7 @@ void EditorShape::OnMouseMove(wxMouseEvent& event)
 
 	x2 = event.GetX();
 	y2 = event.GetY();
-	if (!ctrlHolding)
+	if (!wxGetKeyState(WXK_CONTROL))
 		shape->ScaleToRect(wxRect(x1, y1, x2 - x1, y2 - y1));
 	else {
 		double c = std::max(abs(x2 - x1), abs(y2 - y1));
@@ -49,16 +56,10 @@ void EditorShape::OnMouseLeave(wxMouseEvent& event)
 
 void EditorShape::OnKeyDown(wxKeyEvent& event)
 {
-	if (event.GetKeyCode() == WXK_CONTROL) {
-		ctrlHolding = true;
-	}
 }
 
 void EditorShape::OnKeyUp(wxKeyEvent& event)
 {
-	if (event.GetKeyCode() == WXK_CONTROL) {
-		ctrlHolding = false;
-	}
 }
 
 void EditorShape::Draw(wxGraphicsContext* gc)

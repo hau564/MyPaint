@@ -1,4 +1,5 @@
 #include "DrawingCanvas.h"
+#include "gradientdlg.h"
 
 DrawingCanvas::DrawingCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int width, int height)
 	:wxWindow(parent, id, pos, size), width(width), height(height)
@@ -11,7 +12,7 @@ DrawingCanvas::DrawingCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos
 	this->Bind(wxEVT_LEAVE_WINDOW, &DrawingCanvas::onMouseLeave, this);
 	this->Bind(wxEVT_MOUSEWHEEL, &DrawingCanvas::onMouseWheel, this);
 	
-	paperPos = wxPoint2DDouble(150, 100);
+	paperPos = wxPoint2DDouble(80, 30);
 	Reset();
 	//zoom
 	wxArrayString zoomList;
@@ -40,31 +41,13 @@ DrawingCanvas::~DrawingCanvas()
 	}
 }
 
-
-void DrawingCanvas::SetPenColor(wxColor color)
-{
-	penColor = color;
-}
-
-void DrawingCanvas::SetBrushColor(wxColor color)
-{
-	brushColor = color;
-}
-
-void DrawingCanvas::SetPenSize(int size)
-{
-	penSize = size;
-}
-
-void DrawingCanvas::SetShape(Shape shape)
-{
-	this->shape = shape;
-}
-
 void DrawingCanvas::SetMode(int mode)
 {
 	this->mode = mode;
-	if (editor) delete editor;
+	if (editor) {
+		editor->Finish();
+		delete editor;
+	}
 	editor = nullptr;
 
 	std::vector<Object*> paths;
@@ -129,6 +112,7 @@ void DrawingCanvas::TransformCanvas(int id)
 void DrawingCanvas::OnExport(wxCommandEvent& event)
 {
 	scaleMatrix = imatrix = wxAffineMatrix2D();
+	if (editor) editor->Reset();
 	Refresh();
 
 	wxFileDialog saveFileDialog(this, _("Save drawing"), "", "",
@@ -159,15 +143,14 @@ void DrawingCanvas::OnExport(wxCommandEvent& event)
 
 	bitmap.SaveFile(saveFileDialog.GetPath(), wxBITMAP_TYPE_PNG);
 	bitmap.SaveFile(saveFileDialog.GetPath(), wxBITMAP_TYPE_JPEG);
-
+	
 	Reset();
 }
 
 void DrawingCanvas::OnUndo(wxCommandEvent& event)
 {
 	if (editor) {
-		wxMouseEvent e;
-		editor->OnMouseUp(e);
+		editor->Finish();
 	}
 	history->Undo();
 	Refresh();
@@ -176,8 +159,7 @@ void DrawingCanvas::OnUndo(wxCommandEvent& event)
 void DrawingCanvas::OnRedo(wxCommandEvent& event)
 {
 	if (editor) {
-		wxMouseEvent e;
-		editor->OnMouseUp(e);
+		editor->Finish();
 	}
 	history->Redo();
 	Refresh();
@@ -193,8 +175,11 @@ void DrawingCanvas::Reset()
 	scaleMatrix = imatrix = wxAffineMatrix2D();
 	scaleMatrix.Translate(paperPos.m_x, paperPos.m_y);
 	imatrix.Translate(-paperPos.m_x, -paperPos.m_y);
+
 	Refresh();
 }
+
+
 
 
 
@@ -219,6 +204,9 @@ void DrawingCanvas::AddUndoneAction(Action* action)
 void DrawingCanvas::FinishDrawing()
 {
 	onMouseUp(lastEvent);
+	if (editor) {
+		editor->Finish();
+	}
 }
 
 void DrawingCanvas::TransformEvent(wxMouseEvent& event) {
@@ -269,29 +257,20 @@ void DrawingCanvas::onZoom(wxCommandEvent& event)
 	int zoom = std::stoi(str);
 	scaleMatrix = imatrix = wxAffineMatrix2D();
 	Scale(wxPoint2DDouble(GetSize().x / 2, GetSize().y / 2), 1.0 * zoom / 100.0);
+	scaleMatrix.Translate(paperPos.m_x, paperPos.m_y);
+	imatrix.Translate(-paperPos.m_x, -paperPos.m_y);
+	Refresh();
 }
 
 void DrawingCanvas::onKeyDown(wxKeyEvent& event)
 {
 	if (editor) editor->OnKeyDown(event);
-	if (event.GetKeyCode() == WXK_CONTROL) {
-		ctrlHolding = true;
-	}
-	if (event.GetKeyCode() == WXK_ALT) {
-		altHolding = true;
-	}
 	Refresh();
 }
 
 void DrawingCanvas::onKeyUp(wxKeyEvent& event)
 {
 	if (editor) editor->OnKeyUp(event);
-	if (event.GetKeyCode() == WXK_CONTROL) {
-		ctrlHolding = false;
-	}
-	if (event.GetKeyCode() == WXK_ALT) {
-		altHolding = false;
-	}
 	Refresh();
 }
 
@@ -333,18 +312,18 @@ void DrawingCanvas::onMouseWheel(wxMouseEvent& event)
 	scaleMatrix.TransformPoint(&x2, &y2);
 
 
-	if (ctrlHolding) {
+	if (event.ControlDown()) {
 		wxPoint2DDouble scalePoint = event.GetPosition();
 		double newScale = -1;
 		if (event.GetWheelRotation() > 0) {
 			double maxScale = 30;
-			if (x2 - x1 <= width * 30) {
-				newScale = std::min(1.1, width * 30 / (x2 - x1));
+			if (abs(x2 - x1) <= width * 30) {
+				newScale = std::min(1.1, width * 30 / abs(x2 - x1));
 			}
 		}
 		else {
-			if (x2 - x1 > width / 2) {
-				newScale = std::max(1.0 / 1.1, width / 2 / (x2 - x1));
+			if (abs(x2 - x1) > width / 10) {
+				newScale = std::max(1.0 / 1.1, width / 10 / abs(x2 - x1));
 			}
 		}
 		Scale(scalePoint, newScale);
@@ -352,12 +331,12 @@ void DrawingCanvas::onMouseWheel(wxMouseEvent& event)
 	}
 	wxPoint2DDouble move(0, 0);
 	int d = 20;
-	if (altHolding) {
-		if (event.GetWheelRotation() > 0) {
-			move.m_x = d;
+	if (event.AltDown()) {
+		if (event.GetWheelRotation() < 0) {
+			move.m_x = -d;
 		}
 		else {
-			move.m_x = -d;
+			move.m_x = d;
 		}
 	}
 	else {
@@ -383,7 +362,6 @@ void DrawingCanvas::draw(wxGraphicsContext* gc)
 	gc->SetPen(wxPen(*wxWHITE, 0));
 	gc->SetBrush(*wxWHITE_BRUSH);
 	gc->DrawRectangle(0, 0, width, height);
-	//gc->Clip(0, 0, GetSize().x, GetSize().y);
 
 	for (Layer* layer : layers) {
 		layer->Draw(gc);

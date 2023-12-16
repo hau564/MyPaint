@@ -28,7 +28,12 @@
     <ClCompile Include="EditorShape.cpp" />
     <ClCompile Include="EditorText.cpp" />
     <ClCompile Include="Explorer.cpp" />
+    <ClCompile Include="gradient.cpp" />
+    <ClCompile Include="GradientBrush.cpp" />
+    <ClCompile Include="gradientdlg.cpp" />
+    <ClCompile Include="GradientPane.cpp" />
     <ClCompile Include="History.cpp" />
+    <ClCompile Include="ImageGradientPane.cpp" />
     <ClCompile Include="ImagePane.cpp" />
     <ClCompile Include="Layer.cpp" />
     <ClCompile Include="main.cpp" />
@@ -42,6 +47,7 @@
     <ClCompile Include="ShapePane.cpp" />
     <ClCompile Include="SizePane.cpp" />
     <ClCompile Include="Text.cpp" />
+    <ClCompile Include="ToolsSelection.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Action.h" />
@@ -56,7 +62,12 @@
     <ClInclude Include="EditorShape.h" />
     <ClInclude Include="EditorText.h" />
     <ClInclude Include="Explorer.h" />
+    <ClInclude Include="gradient.h" />
+    <ClInclude Include="GradientBrush.h" />
+    <ClInclude Include="gradientdlg.h" />
+    <ClInclude Include="GradientPane.h" />
     <ClInclude Include="History.h" />
+    <ClInclude Include="ImageGradientPane.h" />
     <ClInclude Include="ImagePane.h" />
     <ClInclude Include="Layer.h" />
     <ClInclude Include="List.h" />
@@ -71,10 +82,14 @@
     <ClInclude Include="ShapePane.h" />
     <ClInclude Include="SizePane.h" />
     <ClInclude Include="Text.h" />
+    <ClInclude Include="ToolsSelection.h" />
     <ClInclude Include="Transform.h" />
     <ClInclude Include="TransformMove.h" />
     <ClInclude Include="TransformResize.h" />
     <ClInclude Include="TransformRotate.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="diagram.md" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <VCProjectVersion>16.0</VCProjectVersion>

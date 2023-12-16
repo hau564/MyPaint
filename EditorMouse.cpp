@@ -105,6 +105,17 @@ void EditorMouse::OnKeyUp(wxKeyEvent &event)
 	}
 }
 
+void EditorMouse::Finish()
+{
+	wxMouseEvent event;
+	OnMouseUp(event);
+}
+
+void EditorMouse::Reset()
+{
+	for (auto object : objects) object->selectionBox.SetSelected(false);
+}
+
 void EditorMouse::Draw(wxGraphicsContext* gc)
 {
 	

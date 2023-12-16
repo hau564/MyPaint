@@ -2,6 +2,7 @@
 
 #include "Editor.h"
 #include "Text.h"
+#include <map>
 
 class EditorText : public Editor
 {
@@ -13,10 +14,12 @@ public:
 	void OnMouseUp(wxMouseEvent& event) override;
 	void OnMouseLeave(wxMouseEvent& event) override;
 	void OnKeyDown(wxKeyEvent& event) override;
+	void OnKeyUp(wxKeyEvent& event) override;
 	void OnChar(wxKeyEvent& event) override;
+	void Finish() override;
 
 	void Draw(wxGraphicsContext* gc) override;
 private:
 	Text* text;
-	std::string charSet = " `1234567890-=qwertyuiop[]\asdfghjkl;zxcvbnm,./\'!@#$%^&*()_+QWERTYUIOP{}|ASDFGHJKL:ZXCVBNM<>?";
+	std::map<int, int> up;
 };

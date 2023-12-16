@@ -18,6 +18,7 @@ public:
 	void DrawContent(wxGraphicsContext* gc) override;
 
 	void AddPoint(wxPoint2DDouble point);
+	void AddPoint(double x, double y);
 	
 public:
 	wxColour color;

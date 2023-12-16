@@ -15,6 +15,7 @@ Panel::Panel(wxWindow* parent, DrawingCanvas* _canvas, wxWindowID id, const wxPo
     SetupSizePanes();
     SetupColorPanes();
     SetupBrushPanes();
+    SetupGradientPanes();
 
     this->SetSizer(mainSizer);
     
@@ -139,6 +140,27 @@ void Panel::SetupMouseButtons()
     mainSizer->Add(functionSizer, 0, wxALL, FromDIP(5));
 }
 
+void Panel::SetupColorPicker(ImagePane* colorPicker, std::function<void(wxColor)> SelectColor)
+{
+    colorPicker->Bind(wxEVT_LEFT_DOWN, [this, colorPicker, SelectColor](wxMouseEvent& event) {
+        SelectColor(colorPicker->GetColor());
+    });
+    colorPicker->Bind(wxEVT_LEFT_DCLICK, [this, colorPicker, SelectColor](wxMouseEvent& event)
+        {
+            wxColourDialog dialog(this);
+            if (dialog.ShowModal() == wxID_OK)
+            {
+                wxColor color = dialog.GetColourData().GetColour();
+                colorPicker->SetBGColor(color);
+                colorPicker->Refresh();
+                SelectColor(color);
+            }
+        });
+    colorPicker->SetPosition(2, 2);
+    colorPicker->SetScale(0.6, 0.6);
+    colorPicker->SetBGColor(wxColor(200, 200, 200));
+}
+
 void Panel::SetupColorPanes()
 {
     colorText = new wxStaticText(this, wxID_ANY, "Colors");
@@ -155,20 +177,9 @@ void Panel::SetupColorPanes()
         colorPaneSizer->Add(colorPane, 0, wxRIGHT | wxBOTTOM, FromDIP(5));
     }
 
-    wxImage* customColorImage = new wxImage("data/customColorPane.png", wxBITMAP_TYPE_PNG);
-    customColorImage->Rescale(colorPanes[0]->GetSize().x, colorPanes[0]->GetSize().y);
-
-    colorPicker = new wxBitmapButton((wxWindow*)this, wxID_ANY, wxBitmap(*customColorImage));
-    colorPicker->Bind(wxEVT_BUTTON, [this](wxCommandEvent& event)
-        {
-            wxColourDialog dialog(this);
-            if (dialog.ShowModal() == wxID_OK)
-            {
-                wxColor color = dialog.GetColourData().GetColour();
-                //AddColor(new ColorPane(this, color));
-                SelectColorPane(new ColorPane(nullptr, color));
-            }
-        });
+    auto colorPicker = new ImagePane(this, "data/customColorPane.png");
+    SetupColorPicker(colorPicker, [this](wxColor color) {SelectColorPane(color); });
+    this->colorPicker = colorPicker;
 
     colorPaneSizer->Add(colorPicker, 0, wxRIGHT | wxBOTTOM, FromDIP(5));
     mainSizer->Add(colorPaneSizer, 0, wxALL, FromDIP(5));
@@ -222,12 +233,12 @@ void Panel::SetupShapePanes()
 
     //5
     shapes.push_back(std::vector<wxPoint2DDouble>());
-    for (double a = -pi / 2; a <= pi * 3 / 2 + 0.000001; a += (pi * 2) / 5) {
+    for (double a = -pi / 2.0; a <= pi * 3.0 / 2.0 + 0.000001; a += (pi * 2.0) / 5.0) {
         shapes.back().push_back({ 50.0 + 50.0 * cos(a), 50.0 + 50.0 * sin(a) });
     }
     //6
     shapes.push_back(std::vector<wxPoint2DDouble>());
-    for (double a = -pi / 2; a <= pi * 3 / 2 + 0.000001; a += (pi * 2) / 6) {
+    for (double a = -pi / 2.0; a <= pi * 3.0 / 2.0 + 0.000001; a += (pi * 2.0) / 6.0) {
         shapes.back().push_back({ 50.0 + 50.0 * cos(a), 50.0 + 50.0 * sin(a) });
     }
 
@@ -268,40 +279,87 @@ void Panel::SetupBrushPanes()
         brushPaneSizer->Add(brushPane, 0, wxRIGHT | wxBOTTOM, FromDIP(5));
     }
 
+    auto brushPicker = new ImagePane(this, "data/customColorPane.png");
+    SetupColorPicker(brushPicker, [this](wxColor color) {SelectBrushPane(color); });
+    this->brushPicker = brushPicker;
+    brushPaneSizer->Add(brushPicker, 0, wxRIGHT | wxBOTTOM, FromDIP(5));
+
     auto colorPane = new ColorPane(this, wxColour(-1, -1, -1, 0));
     colorPane->Bind(wxEVT_LEFT_DOWN, [this, colorPane](wxMouseEvent& event)
         { SelectBrushPane(colorPane); });
     brushPanes.push_back(colorPane);
     brushPaneSizer->Add(colorPane, 0, wxRIGHT | wxBOTTOM, FromDIP(5));
 
-    wxImage* customColorImage = new wxImage("data/customColorPane.png", wxBITMAP_TYPE_PNG);
-    customColorImage->Rescale(brushPanes[0]->GetSize().x, brushPanes[0]->GetSize().x);
+    mainSizer->Add(brushPaneSizer, 0, wxALL, FromDIP(5));
+}
 
-    brushPicker = new wxBitmapButton((wxWindow*)this, wxID_ANY, wxBitmap(*customColorImage));
-    brushPicker->Bind(wxEVT_BUTTON, [this](wxCommandEvent& event)
-        {
-            wxColourDialog dialog(this);
-            if (dialog.ShowModal() == wxID_OK)
-            {
-                wxColor color = dialog.GetColourData().GetColour();
-                //AddColor(new ColorPane(this, color));
-                SelectBrushPane(new ColorPane(nullptr, color));
+void Panel::SetupGradientPanes()
+{
+    gradientText = new wxStaticText(this, wxID_ANY, "Gradient Colors");
+	mainSizer->Add(gradientText, 0, wxALL, FromDIP(5));
+	
+    gradientPaneSizer = new wxWrapSizer(wxHORIZONTAL);
+    for (const auto& color : niceColors)
+    {
+        if (color == niceColors[4]) break;
+        wxGraphicsGradientStops stops;        
+        stops.Add(wxGraphicsGradientStop(wxColour(255, 255, 255), 0));
+        stops.Add(wxGraphicsGradientStop(wxColour(color), 1));
+		auto gradientPane = new GradientPane(this);
+        gradientPane->SetGradientStops(stops);
+
+		gradientPane->Bind(wxEVT_LEFT_DOWN, [this, gradientPane](wxMouseEvent& event)
+        			{ SelectGradientPane(gradientPane); });
+		gradientPanes.push_back(gradientPane);
+		gradientPaneSizer->Add(gradientPane, 0, wxRIGHT | wxBOTTOM, FromDIP(5));
+	}
+
+    ImageGradientPane* gradientPicker = new ImageGradientPane(this, "data/customColorPane.png");
+    wxGraphicsGradientStops stops;
+    stops.Add(wxGraphicsGradientStop(wxColour(255, 255, 255), 0));
+    stops.Add(wxGraphicsGradientStop(wxColour(niceColors[4]), 1));
+    gradientPicker->SetGradientStops(stops);
+
+    gradientPicker->Bind(wxEVT_LEFT_DOWN, [this, gradientPicker](wxMouseEvent& event)
+    		{ SelectGradientPane(gradientPicker); });
+    gradientPicker->Bind(wxEVT_LEFT_DCLICK, [this, gradientPicker](wxMouseEvent& event)
+		{
+            wxGradientDialog* dialog = new wxGradientDialog(this);
+            if (dialog->ShowModal() == wxID_OK) {
+                wxGraphicsGradientStops* stops = new wxGraphicsGradientStops();
+                for (int i = 0; i < dialog->GetGradient().getMax(); i++) {
+                    stops->Add(dialog->GetGradient().getColorAt(i), i / (double)(dialog->GetGradient().getMax() - 1));
+                }
+                gradientPicker->SetGradientStops(*stops);
+                gradientPicker->Refresh();
+                canvas->SetGradientStops(*stops);
+                delete stops;
+
             }
+            delete dialog; 
         });
 
-    brushPaneSizer->Add(brushPicker, 0, wxRIGHT | wxBOTTOM, FromDIP(5));
-    mainSizer->Add(brushPaneSizer, 0, wxALL, FromDIP(5));
+    gradientPanes.push_back(gradientPicker);
+    gradientPaneSizer->Add(gradientPicker, 0, wxRIGHT | wxBOTTOM, FromDIP(5));
+
+    mainSizer->Add(gradientPaneSizer, 0, wxALL, FromDIP(5));
 }
 
 
 
 void Panel::SelectColorPane(ColorPane* colorPane)
 {
+    SelectColorPane(colorPane->GetColor());
+}
+
+void Panel::SelectColorPane(wxColor color)
+{
     for (auto& pane : colorPanes)
     {
-		pane->SetSelected(pane->GetColor() == colorPane->GetColor());
-	}
-    canvas->SetPenColor(colorPane->GetColor());
+        pane->SetSelected(pane->GetColor() == color);
+    }
+    colorPicker->SetSelected(color == colorPicker->GetColor());
+    canvas->SetPenColor(color);
 }
 
 void Panel::SelectSizePane(SizePane* sizePane)
@@ -315,6 +373,7 @@ void Panel::SelectSizePane(int size)
     {
 		pane->SetSelected(pane->GetWidth() == size);
 	}
+
     penSlider->SetValue(size);
 	canvas->SetPenSize(size);
 }
@@ -330,11 +389,26 @@ void Panel::SelectShapePane(ShapePane* shapePane)
 
 void Panel::SelectBrushPane(ColorPane* brushPane)
 {
+    SelectBrushPane(brushPane->GetColor());
+}
+
+void Panel::SelectBrushPane(wxColor color)
+{
     for (auto& pane : brushPanes)
     {
-		pane->SetSelected(pane->GetColor() == brushPane->GetColor());
+        pane->SetSelected(pane->GetColor() == color);
+    }
+    brushPicker->SetSelected(color == brushPicker->GetColor());
+    canvas->SetBrushColor(color);
+}
+
+void Panel::SelectGradientPane(GradientPane* gradientPane)
+{
+    for (auto& pane : gradientPanes)
+    {
+		pane->SetSelected(pane == gradientPane);
 	}
-	canvas->SetBrushColor(brushPane->GetColor());
+	canvas->SetGradientStops(gradientPane->GetGradientStops());
 }
 
 void Panel::Layout(int msk)
@@ -374,13 +448,21 @@ void Panel::Layout(int msk)
 		mainSizer->Hide(brushPaneSizer);
 	}
     if (msk & FUNCTION) {
-		mainSizer->Show(functionText);
+        mainSizer->Show(functionText);
         mainSizer->Show(functionSizer);
-	}
+    }
     else {
         mainSizer->Hide(functionText);
-		mainSizer->Hide(functionSizer);
-	}
+        mainSizer->Hide(functionSizer);
+    }
+    if (msk & GRADIENT) {
+        mainSizer->Show(gradientText);
+        mainSizer->Show(gradientPaneSizer);
+    }
+    else {
+        mainSizer->Hide(gradientText);
+        mainSizer->Hide(gradientPaneSizer);
+    }
     mainSizer->Layout();
 }
 
@@ -404,7 +486,7 @@ void Panel::SelectPaint()
 
 void Panel::SelectShape()
 {
-    Layout(COLOR | SIZE | SHAPE | BRUSH);
+    Layout(COLOR | SIZE | SHAPE | BRUSH | GRADIENT);
 	canvas->SetMode(DrawingCanvas::SHAPE);
 }
 

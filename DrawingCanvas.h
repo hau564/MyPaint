@@ -18,25 +18,19 @@
 #include "EditorShape.h"
 #include "EditorText.h"
 
-class DrawingCanvas : public wxWindow
+#include "ToolsSelection.h"
+
+class DrawingCanvas : public wxWindow, public ToolsSelection
 {
 public:
-    DrawingCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int width = 800, int height = 600);
+    DrawingCanvas(wxWindow* parent, wxWindowID id, const wxPoint& pos, const wxSize& size, int width = 1000, int height = 750);
     ~DrawingCanvas();
 
     void SetExplorer(Explorer* explorer);
-    void SetPenColor(wxColor color);
-    void SetBrushColor(wxColor color);
-    void SetPenSize(int size);
-    void SetShape(Shape shape);
     void SetMode(int mode);
+
     int GetMode();
     void TransformCanvas(int id);
-
-    wxColor GetPenColor() const { return penColor; }
-    wxColor GetBrushColor() const { return brushColor; }
-    int GetPenSize() const { return penSize; }
-    Shape GetShape() const { return shape; }
 
     void OnExport(wxCommandEvent& event);
     void OnUndo(wxCommandEvent& event);
@@ -85,16 +79,10 @@ private:
     wxMouseEvent lastEvent;
     wxComboBox *zoomComboBox;
 
-    wxColor penColor = wxColor(0, 0, 0);
-    wxColor brushColor = wxColor(200, 200, 200);
-    int penSize = 1;
-    Shape shape;
-
     std::vector<Layer*> layers;
     Layer* activeLayer;
     Editor* editor;
     History* history;
 
-    bool ctrlHolding = false, altHolding = 0;
     wxAffineMatrix2D scaleMatrix, imatrix;
 };

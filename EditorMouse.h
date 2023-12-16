@@ -21,6 +21,8 @@ public:
 	void OnKeyDown(wxKeyEvent& event) override;
 	void OnKeyUp(wxKeyEvent& event) override;
 
+	void Finish() override;
+	void Reset() override;
 	void Draw(wxGraphicsContext* gc) override;
 
 private:

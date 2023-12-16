@@ -10,6 +10,7 @@ public:
 	virtual std::string GetName() const {
 		return name;
 	}
+private:
 	std::string name;
 };
 

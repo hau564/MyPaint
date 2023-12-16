@@ -36,7 +36,7 @@ public:
 			if (!f) ry = 1.0 + (typeY ? v.m_y : -v.m_y) / (y2 - y1);
 		}
 		if (!f) {
-			if (holdingKey == WXK_CONTROL && typeX != 1 && typeY != 1) rx = ry = std::max(rx, ry);
+			if (holdingKey == WXK_CONTROL && typeX != 1 && typeY != 1) rx = ry = (abs(rx) > abs(ry) ? rx : ry);
 			f = 1;
 		}
 

@@ -40,7 +40,7 @@ MyFrame::MyFrame()
 void MyFrame::BuildMenuBar()
 {
     wxMenu* fileMenu = new wxMenu;
-    fileMenu->Append(ID_Export, "&Export\tCtrl+E");
+    fileMenu->Append(wxID_FILE3, "&Export\tCtrl+E");
     fileMenu->AppendSeparator();
     fileMenu->Append(wxID_EXIT);
 
@@ -59,7 +59,7 @@ void MyFrame::BuildMenuBar()
     menuBar->Append(viewMenu, "&View");
     SetMenuBar(menuBar);
 
-    Bind(wxEVT_MENU, &MyFrame::OnExport, this, ID_Export);
+    Bind(wxEVT_MENU, &MyFrame::OnExport, this, wxID_FILE3);
     Bind(wxEVT_MENU, &MyFrame::OnUndo, this, wxID_UNDO);
     Bind(wxEVT_MENU, &MyFrame::OnRedo, this, wxID_REDO);
     Bind(wxEVT_MENU, &MyFrame::OnHistory, this, wxID_FILE1);

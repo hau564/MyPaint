@@ -5,14 +5,15 @@
 EditorText::EditorText(DrawingCanvas* parent)
 	:Editor(parent)
 {
+    std::string s = "`1234567890-=[]\\;',./";
+    std::string t = "~!@#$%^&*()_+{}|:\"<>?";
+    for (int i = 0; i < (int)s.size(); ++i)
+        up[s[i]] = t[i];
 }
 
 void EditorText::OnMouseDown(wxMouseEvent& event)
 {
-    if (text) {
-        parent->AddPath(text);
-        text = nullptr;
-    }
+    Finish();
 	text = new Text(event.GetPosition(), parent->GetPenColor(), parent->GetPenSize());
 }
 
@@ -26,15 +27,13 @@ void EditorText::OnMouseUp(wxMouseEvent& event)
 
 void EditorText::OnMouseLeave(wxMouseEvent& event)
 {
-    if (!text) return;
-    parent->AddPath(text);
-    text = nullptr;
 }
 
 void EditorText::OnKeyDown(wxKeyEvent& event)
 {
     if (!text) return;
     wxChar uc = event.GetUnicodeKey();
+
     if (uc != WXK_NONE)
     {
         // It's a "normal" character. Notice that this includes
@@ -43,25 +42,50 @@ void EditorText::OnKeyDown(wxKeyEvent& event)
         if (uc >= 32)
         {
             //wxLogMessage("You pressed '%c'", uc);
-			text->Append(uc);
+            char c = uc;
+            if (c >= 'A' && c <= 'Z') {
+                if (!(event.ShiftDown() ^ wxGetKeyState(WXK_CAPITAL))) {
+                    c = c - 'A' + 'a';
+                }
+            }
+            else {
+                if (event.ShiftDown()) c = up[c];
+            }
+            text->Append(c);
         }
         else
         {
-            if (event.GetKeyCode() == WXK_BACK) {
+            switch (uc)
+            {
+            case WXK_BACK:
                 text->Pop();
+                break;
+            case WXK_RETURN:
+                text->Append('\n');
+                break;
+            default:
+                Finish();
+                break;
             }
             return;
         }
     }
-
-    if (event.GetKeyCode() == WXK_BACK) {
-		text->Pop();
-	}
     event.Skip();
+}
+
+void EditorText::OnKeyUp(wxKeyEvent& event)
+{
 }
 
 void EditorText::OnChar(wxKeyEvent& event)
 {
+}
+
+void EditorText::Finish()
+{
+    if (!text) return;
+    parent->AddPath(text);
+    text = nullptr;
 }
 
 void EditorText::Draw(wxGraphicsContext* gc)

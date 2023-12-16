@@ -20,7 +20,7 @@ BEGIN_EVENT_TABLE(MyApp, wxApp)
     EVT_KEY_DOWN(MyApp::OnKeyDown)
     EVT_KEY_UP(MyApp::OnKeyUp)
     EVT_NAVIGATION_KEY(MyApp::OnSpecial)
-    //EVT_CHAR_HOOK(MyApp::OnChar)
+    EVT_CHAR_HOOK(MyApp::OnChar)
 END_EVENT_TABLE()
 
 bool MyApp::OnInit()
@@ -32,7 +32,6 @@ bool MyApp::OnInit()
 
 void MyApp::OnKeyDown(wxKeyEvent& event)
 {
-    frame->OnKeyDown(event);
 }
 
 void MyApp::OnKeyUp(wxKeyEvent& event)
@@ -42,19 +41,12 @@ void MyApp::OnKeyUp(wxKeyEvent& event)
 
 void MyApp::OnChar(wxKeyEvent& event)
 {
-    frame->OnChar(event);
+    frame->OnKeyDown(event);
+    //if (event.GetUnicodeKey() == WXK_NONE || event.GetUnicodeKey() < 32)
+    event.Skip();
 }
 
 void MyApp::OnSpecial(wxNavigationKeyEvent& event)
 {
-    if (event.IsFromTab()) {
-        wxKeyEvent keyEvent(wxEVT_KEY_DOWN);
-        keyEvent.m_keyCode = WXK_TAB;
-        frame->OnKeyDown(keyEvent);
-    }
-    if (event.IsBackward()) {
-		wxKeyEvent keyEvent(wxEVT_KEY_DOWN);
-		keyEvent.m_keyCode = WXK_BACK;
-		frame->OnKeyDown(keyEvent);
-	}
+    event.Skip(false);
 }
