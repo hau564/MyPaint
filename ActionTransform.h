@@ -15,8 +15,7 @@ public:
 			memTransforms.push_back(object->selectionBox.GetBaseTransform());
 	};
 	~ActionTransform() {
-		for (auto object : objects)
-			if (object) delete object;
+		delete transform;
 	}
 
 	void Undo() override {

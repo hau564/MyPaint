@@ -39,6 +39,7 @@ DrawingCanvas::~DrawingCanvas()
 		delete layers.back();
 		layers.pop_back();
 	}
+	delete history;
 }
 
 void DrawingCanvas::SetMode(int mode)

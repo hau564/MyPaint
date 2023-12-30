@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="ActionDeleteObject.h" />
     <ClCompile Include="ActionPane.cpp" />
     <ClCompile Include="ColorPane.cpp" />
     <ClCompile Include="DrawingCanvas.cpp" />

@@ -37,6 +37,13 @@ MyFrame::MyFrame()
     canvas->SetMode(DrawingCanvas::DRAW);
 }
 
+MyFrame::~MyFrame()
+{
+    delete canvas;
+    delete panel;
+    delete explorer;
+}
+
 void MyFrame::BuildMenuBar()
 {
     wxMenu* fileMenu = new wxMenu;

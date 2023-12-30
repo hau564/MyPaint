@@ -30,6 +30,7 @@ private:
 	void SetupShapePanes();
 	void SetupBrushPanes();
 	void SetupGradientPanes();
+	void SetupFont();
 
 	void SelectColorPane(ColorPane* colorPane);
 	void SelectColorPane(wxColor color);
@@ -46,7 +47,8 @@ private:
 		SHAPE = 4,
 		BRUSH = 8,
 		FUNCTION = 16,
-		GRADIENT = 32
+		GRADIENT = 32,
+		FONT = 64,
 	};
 
 	void Layout(int msk);
@@ -95,6 +97,10 @@ private:
 	std::vector<ShapePane*> shapePanes;
 	wxWrapSizer* shapePaneSizer;
 	wxStaticText * shapeText;
+
+	wxStaticText * fontText;
+	ImagePane* font;
+	wxWrapSizer* fontSizer;
 
 
 	const std::vector<std::string> niceColors = 

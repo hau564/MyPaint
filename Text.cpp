@@ -1,9 +1,9 @@
 #include "Text.h"
 
-Text::Text(wxPoint2DDouble pos, wxColour color, int size)
-	:pos(pos), color(color), size(size)
+Text::Text(wxPoint2DDouble pos, wxColour color, int size, wxFont font)
+	:pos(pos), color(color), size(size), font(font)
 {
-	font = wxFont(size, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL);
+	this->font = wxFont(size, font.GetFamily(), font.GetStyle(), font.GetWeight());
 }
 
 void Text::Pop()

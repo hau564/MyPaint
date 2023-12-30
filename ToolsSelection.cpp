@@ -26,3 +26,8 @@ void ToolsSelection::SetGradientStops(wxGraphicsGradientStops stops)
 	isGradient = true;
 	this->stops = stops;
 }
+
+void ToolsSelection::SetTextFont(wxFont font)
+{
+	this->font = font;
+}

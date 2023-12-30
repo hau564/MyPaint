@@ -7,6 +7,10 @@ History::History(wxWindow* parent, Explorer* explorer)
 
 History::~History()
 {
+	for (auto action : actions)
+	{
+		delete action;
+	}
 
 }
 

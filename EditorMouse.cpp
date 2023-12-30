@@ -96,6 +96,18 @@ void EditorMouse::OnKeyDown(wxKeyEvent &event)
 	if (event.GetKeyCode() == WXK_CONTROL) {
 		ctrlHolding = true;
 	}
+	if (event.GetKeyCode() == WXK_DELETE) {
+		std::vector<Object*> selectedObjects;
+		for (auto object : objects) {
+			if (!object->showing) continue;
+			if (object->selectionBox.IsSelected()) {
+				selectedObjects.push_back(object);
+			}
+		}
+		if (selectedObjects.empty()) return;
+		parent->AddUndoneAction(new ActionDeleteObject<Object>(selectedObjects));
+	}
+	parent->Refresh();
 }
 
 void EditorMouse::OnKeyUp(wxKeyEvent &event)

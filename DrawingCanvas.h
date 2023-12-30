@@ -12,6 +12,7 @@
 
 #include "ActionNewObject.h"
 #include "ActionTransform.h"
+#include "ActionDeleteObject.h"
 
 #include "EditorDraw.h"
 #include "EditorMouse.h"

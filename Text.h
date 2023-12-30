@@ -5,7 +5,7 @@
 class Text : public Object
 {
 public:
-	Text(wxPoint2DDouble pos, wxColour color, int size);
+	Text(wxPoint2DDouble pos, wxColour color, int size, wxFont font = wxFont(20, wxFONTFAMILY_DEFAULT, wxFONTSTYLE_NORMAL, wxFONTWEIGHT_NORMAL));
 
 	void Pop();
 	void Append(char c);

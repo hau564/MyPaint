@@ -15,6 +15,7 @@ class MyFrame : public wxFrame
 {
 public:
     MyFrame();
+    ~MyFrame();
 
     void OnKeyDown(wxKeyEvent& event);
     void OnKeyUp(wxKeyEvent& event);

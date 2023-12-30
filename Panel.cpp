@@ -1,5 +1,6 @@
 #include "Panel.h"
 #include <wx/colordlg.h>
+#include <wx/fontdlg.h>
 
 Panel::Panel(wxWindow* parent, DrawingCanvas* _canvas, wxWindowID id, const wxPoint& pos, const wxSize& size)
 	: wxScrolled<wxPanel>(parent, wxID_ANY), canvas(_canvas)
@@ -16,6 +17,7 @@ Panel::Panel(wxWindow* parent, DrawingCanvas* _canvas, wxWindowID id, const wxPo
     SetupColorPanes();
     SetupBrushPanes();
     SetupGradientPanes();
+    SetupFont();
 
     this->SetSizer(mainSizer);
     
@@ -345,6 +347,27 @@ void Panel::SetupGradientPanes()
     mainSizer->Add(gradientPaneSizer, 0, wxALL, FromDIP(5));
 }
 
+void Panel::SetupFont()
+{
+    fontText = new wxStaticText(this, wxID_ANY, "Font");
+    mainSizer->Add(fontText, 0, wxALL, FromDIP(5));
+
+    font = new ImagePane(this, "data/font.png");
+    font->Bind(wxEVT_LEFT_DOWN, [this](wxMouseEvent& event)
+        {
+			wxFontDialog* dialog = new wxFontDialog(this);
+            if (dialog->ShowModal() == wxID_OK) {
+				wxFontData data = dialog->GetFontData();
+                canvas->SetPenSize(data.GetChosenFont().GetPointSize());
+                canvas->SetTextFont(data.GetChosenFont());
+			}
+            delete dialog; 
+		});
+    fontSizer = new wxWrapSizer(wxHORIZONTAL);
+    fontSizer->Add(font, 0, wxRIGHT | wxBOTTOM, FromDIP(5));
+    mainSizer->Add(fontSizer, 0, wxALL, FromDIP(5));
+}
+
 
 
 void Panel::SelectColorPane(ColorPane* colorPane)
@@ -463,6 +486,14 @@ void Panel::Layout(int msk)
         mainSizer->Hide(gradientText);
         mainSizer->Hide(gradientPaneSizer);
     }
+    if (msk & FONT) {
+		mainSizer->Show(fontText);
+		mainSizer->Show(fontSizer);
+	}
+    else {
+		mainSizer->Hide(fontText);
+		mainSizer->Hide(fontSizer);
+	}
     mainSizer->Layout();
 }
 
@@ -492,6 +523,6 @@ void Panel::SelectShape()
 
 void Panel::SelectText()
 {
-    Layout(SIZE | COLOR);
+    Layout(SIZE | COLOR | FONT);
 	canvas->SetMode(DrawingCanvas::TEXT);
 }

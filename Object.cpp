@@ -7,6 +7,6 @@ void Object::DrawBox(wxGraphicsContext* gc)
 
 void Object::Draw(wxGraphicsContext* gc)
 {
-	DrawContent(gc);
+	if (showing) DrawContent(gc);
 	DrawBox(gc);
 }

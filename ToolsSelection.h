@@ -11,6 +11,7 @@ public:
     void SetPenSize(int size);
     void SetShape(Shape shape);
     void SetGradientStops(wxGraphicsGradientStops stops);
+    void SetTextFont(wxFont font);
 
     wxColor GetPenColor() const { return penColor; }
     wxColor GetBrushColor() const { return brushColor; }
@@ -18,6 +19,7 @@ public:
     Shape GetShape() const { return shape; }
     wxGraphicsGradientStops GetGradientStops() const { return stops; }
     bool IsGradient() const { return isGradient; }
+    wxFont GetTextFont() const { return font; }
 
 private:
     wxColor penColor = wxColor(0, 0, 0);
@@ -26,5 +28,6 @@ private:
     Shape shape;
     wxGraphicsGradientStops stops;
     bool isGradient = false;
+    wxFont font;
 };
 

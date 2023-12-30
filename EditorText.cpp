@@ -14,7 +14,7 @@ EditorText::EditorText(DrawingCanvas* parent)
 void EditorText::OnMouseDown(wxMouseEvent& event)
 {
     Finish();
-	text = new Text(event.GetPosition(), parent->GetPenColor(), parent->GetPenSize());
+	text = new Text(event.GetPosition(), parent->GetPenColor(), parent->GetPenSize(), parent->GetTextFont());
 }
 
 void EditorText::OnMouseMove(wxMouseEvent& event)
