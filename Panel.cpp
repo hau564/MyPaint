@@ -358,7 +358,7 @@ void Panel::SetupFont()
 			wxFontDialog* dialog = new wxFontDialog(this);
             if (dialog->ShowModal() == wxID_OK) {
 				wxFontData data = dialog->GetFontData();
-                canvas->SetPenSize(data.GetChosenFont().GetPointSize());
+                SelectSizePane(data.GetChosenFont().GetPointSize());
                 canvas->SetTextFont(data.GetChosenFont());
 			}
             delete dialog; 

@@ -26,4 +26,9 @@ void Layer::Draw(wxGraphicsContext* gc)
 		it->data->Draw(gc);
 		it = it->next;
 	}
+	it = First();
+	while (it != Tail()) {
+		it->data->DrawBox(gc);
+		it = it->next;
+	}
 }

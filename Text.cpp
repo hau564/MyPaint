@@ -3,7 +3,7 @@
 Text::Text(wxPoint2DDouble pos, wxColour color, int size, wxFont font)
 	:pos(pos), color(color), size(size), font(font)
 {
-	this->font = wxFont(size, font.GetFamily(), font.GetStyle(), font.GetWeight());
+	this->font = wxFont(size, font.GetFamily(), font.GetStyle(), font.GetWeight(), font.GetUnderlined(), font.GetFaceName());
 }
 
 void Text::Pop()
